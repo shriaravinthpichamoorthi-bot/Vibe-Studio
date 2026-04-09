@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibestudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0b0a;
+  --bg2:#131211;
+  --bg3:#1a1917;
+  --bg4:#222120;
+  --bg5:#2a2927;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:#e8e5e0;
+  --text2:#a09d98;
+  --text3:#6a6760;
+  --text4:#3a3835;
+  --amber:#d4621a;
+  --amber2:#f0a060;
+  --amber3:rgba(212,98,26,0.15);
+  --amber4:rgba(212,98,26,0.08);
+  --green:#3a8a5a;
+  --green2:rgba(58,138,90,0.15);
+  --red:#c04040;
+  --red2:rgba(192,64,64,0.12);
+  --yellow2:rgba(180,140,40,0.15);
+  --blue:#3a72b8;
+  --blue2:rgba(58,114,184,0.12);
+  --radius:8px;
+  --radius-lg:12px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'DM Sans',sans-serif;color:var(--text);font-size:14px;line-height:1.6;display:flex;flex-direction:column}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* ── TOP BAR ── */
+.topbar{height:48px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.25rem;gap:1rem;flex-shrink:0;z-index:100}
+.logo{font-family:'Instrument Serif',serif;font-size:19px;color:var(--text);letter-spacing:-.2px;display:flex;align-items:center;gap:2px}
+.logo em{color:var(--amber);font-style:italic}
+.topbar-sep{width:1px;height:20px;background:var(--border);margin:0 .25rem}
+.demo-chip{font-size:10px;font-weight:500;color:var(--amber2);background:var(--amber4);border:1px solid rgba(212,98,26,.25);padding:2px 9px;border-radius:20px;letter-spacing:.04em}
+.idea-switcher{display:flex;gap:3px;margin-left:auto}
+.isw-btn{padding:4px 12px;border-radius:6px;border:1px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);transition:all .15s;font-family:'DM Sans',sans-serif;letter-spacing:.01em}
+.isw-btn:hover:not(.active){background:var(--bg4);color:var(--text2)}
+.isw-btn.active{background:var(--bg4);color:var(--text);border-color:var(--border2)}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-pad{padding:1.25rem .875rem}
+.sidebar-section{margin-bottom:1.75rem}
+.sl{font-size:9.5px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.1em;padding:0 .5rem;margin-bottom:.6rem}
+
+.pni{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:all .15s;margin-bottom:1px;position:relative}
+.pni:hover:not(.locked){background:var(--bg4)}
+.pni.active{background:var(--bg3)}
+.pni.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
+.pni-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;background:var(--bg4);color:var(--text3);border:1px solid var(--border);transition:all .2s}
+.pni.active .pni-dot{background:var(--amber);color:#fff;border-color:var(--amber)}
+.pni.done .pni-dot{background:var(--green2);color:var(--green);border-color:rgba(58,138,90,.3)}
+.pni-label{font-size:12px;color:var(--text2);font-weight:400}
+.pni.active .pni-label{color:var(--text);font-weight:500}
+.pni.done .pni-label{color:var(--text2)}
+
+.dec-item{margin-bottom:.875rem}
+.dec-key{font-size:9.5px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.dec-val{font-size:12px;color:var(--text2);line-height:1.4}
+.dec-val.empty{color:var(--text4);font-style:italic}
+.dec-val.set{color:var(--amber2)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.main-inner{max-width:720px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* phase panel */
+.panel{display:none}
+.panel.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.phase-eyebrow{font-size:10.5px;font-weight:500;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.phase-title{font-family:'Instrument Serif',serif;font-size:30px;color:var(--text);line-height:1.2;margin-bottom:.5rem}
+.phase-desc{font-size:13px;color:var(--text3);max-width:500px;line-height:1.65;margin-bottom:1.75rem}
+
+/* cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.375rem;margin-bottom:.875rem}
+.card-hd{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+.card-hd-badge{font-size:10px;padding:1px 7px;border-radius:10px;font-weight:500}
+
+/* inputs */
+textarea.ti,input.ti{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border .15s,background .15s;resize:none;line-height:1.6}
+textarea.ti:focus,input.ti:focus{border-color:var(--border2);background:var(--bg2)}
+textarea.ti::placeholder,input.ti::placeholder{color:var(--text4)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;letter-spacing:.01em}
+.btn-primary{background:var(--amber);color:#fff}
+.btn-primary:hover{background:#b8521a}
+.btn-primary:disabled{background:var(--bg4);color:var(--text4);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg4);border-color:var(--border2);color:var(--text)}
+.btn-row{display:flex;gap:.625rem;margin-top:1.25rem;align-items:center;flex-wrap:wrap}
+
+/* loading */
+.thinking{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:13px;padding:.5rem 0}
+.thdots{display:flex;gap:3px}
+.thd{width:4px;height:4px;border-radius:50%;background:var(--amber);opacity:.4;animation:thb 1.2s ease infinite}
+.thd:nth-child(2){animation-delay:.2s}.thd:nth-child(3){animation-delay:.4s}
+@keyframes thb{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* typing effect */
+.typed::after{content:'|';color:var(--amber);animation:blink .7s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.typed.done::after{display:none}
+
+/* ── PHASE 1 IDEATION ── */
+.idea-input-wrap{position:relative}
+.idea-hint{font-size:11.5px;color:var(--text4);margin-top:.5rem;line-height:1.5}
+
+.qa-item{margin-bottom:1.125rem;animation:fadeUp .3s ease}
+.qa-q{display:flex;align-items:flex-start;gap:.625rem;margin-bottom:.5rem}
+.qa-qnum{width:20px;height:20px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);flex-shrink:0;margin-top:2px}
+.qa-qtext{font-size:13px;font-weight:500;color:var(--text);line-height:1.5}
+.qa-ans{margin-left:26px;background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--amber);border-radius:var(--radius);padding:.65rem .9rem;font-size:13px;color:var(--text2);line-height:1.55;min-height:44px}
+.qa-ans[contenteditable="true"]:focus{outline:none;border-color:var(--border2);background:var(--bg2)}
+
+/* kernel */
+.kernel-row{display:grid;grid-template-columns:110px 1fr;gap:.5rem 1.25rem;padding:.65rem 0;border-bottom:1px solid var(--border)}
+.kernel-row:last-child{border-bottom:none}
+.kr-key{font-size:10px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.07em;padding-top:3px}
+.kr-val{font-size:13px;color:var(--text);line-height:1.55;border-radius:4px;padding:1px 4px;margin:-1px -4px}
+.kr-val[contenteditable="true"]:focus{outline:none;background:var(--bg4)}
+.kr-val.typing::after{content:'|';color:var(--amber);animation:blink .7s step-end infinite}
+
+/* analysis */
+.ana-item{display:flex;gap:.75rem;padding:.875rem 1rem;border-radius:var(--radius);margin-bottom:.5rem;animation:fadeUp .3s ease}
+.ana-strong{background:var(--green2);border:1px solid rgba(58,138,90,.2)}
+.ana-weak{background:var(--yellow2);border:1px solid rgba(180,140,40,.2)}
+.ana-risk{background:var(--red2);border:1px solid rgba(192,64,64,.2)}
+.ana-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px}
+.ana-strong .ana-icon{background:var(--green);color:#fff}
+.ana-weak .ana-icon{background:#7a6010;color:#fff}
+.ana-risk .ana-icon{background:var(--red);color:#fff}
+.ana-body strong{display:block;font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+.ana-body span{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* ── PHASE 2 FEATURES ── */
+.bucket-tag{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.625rem;display:flex;align-items:center;gap:.5rem}
+.bt-core{color:var(--amber2)}
+.bt-should{color:var(--blue);opacity:.9}
+.bt-nice{color:var(--text3)}
+.bt-road{color:var(--green)}
+.bt-sep{flex:1;height:1px;background:var(--border)}
+
+.fi{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem .9rem;display:flex;gap:.75rem;margin-bottom:.375rem;animation:fadeUp .25s ease;cursor:grab;transition:border .15s,opacity .15s}
+.fi:active{cursor:grabbing}
+.fi.dragging{opacity:.4;border-style:dashed}
+.fi.drag-over{border-color:var(--amber);background:var(--amber4)}
+.fi-cx{font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;flex-shrink:0;margin-top:3px;white-space:nowrap;letter-spacing:.03em}
+.cx-simple{background:rgba(58,138,90,.25);color:#5cc48a;border:1px solid rgba(58,138,90,.3)}
+.cx-moderate{background:rgba(200,160,40,.2);color:#d4a840;border:1px solid rgba(200,160,40,.3)}
+.cx-complex{background:rgba(192,64,64,.2);color:#e06060;border:1px solid rgba(192,64,64,.3)}
+.fi-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.fi-desc{font-size:12px;color:var(--text3);line-height:1.4}
+.fi-move{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.fi-move-btn{font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg4);color:var(--text4);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.fi-move-btn:hover{border-color:var(--border2);color:var(--text2);background:var(--bg5)}
+.fi-remove{font-size:14px;color:var(--text4);cursor:pointer;padding:0 2px;transition:color .15s;line-height:1;flex-shrink:0;margin-top:1px}
+.fi-remove:hover{color:var(--red)}
+
+/* ── NARRATION CARD ── */
+.narration{background:linear-gradient(135deg,rgba(212,98,26,.12),rgba(212,98,26,.06));border:1px solid rgba(212,98,26,.25);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.25rem;position:relative;animation:fadeUp .25s ease}
+.narration-label{font-size:9.5px;font-weight:500;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.narration-text{font-size:13px;color:var(--text2);line-height:1.65}
+.narration-dismiss{position:absolute;top:.75rem;right:.875rem;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--text4);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.narration-dismiss:hover{background:rgba(255,255,255,.1);color:var(--text2)}
+.phase-q-btn{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);color:var(--text4);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;font-family:'DM Sans',sans-serif;margin-left:.5rem;vertical-align:middle;flex-shrink:0}
+.phase-q-btn:hover{background:var(--bg5);border-color:var(--border2);color:var(--amber)}
+
+/* ── TUTORIAL OVERLAY ── */
+.tut-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:2rem;animation:fadeUp .25s ease}
+.tut-overlay.hidden{display:none}
+.tut-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:1.5rem 1.75rem;max-width:480px;width:100%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.tut-step{font-size:10px;font-weight:500;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.tut-title{font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);margin-bottom:.5rem;line-height:1.2}
+.tut-body{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:1.25rem}
+.tut-actions{display:flex;align-items:center;gap:.625rem}
+.tut-skip{font-size:12px;color:var(--text4);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;margin-left:auto;text-decoration:underline}
+.tut-skip:hover{color:var(--text3)}
+.tut-dots{display:flex;gap:4px;align-items:center}
+.tut-dot{width:5px;height:5px;border-radius:50%;background:var(--bg5)}
+.tut-dot.on{background:var(--amber);width:16px;border-radius:3px}
+.tut-spotlight{position:fixed;z-index:999;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.65);border-radius:10px;transition:all .3s ease;border:2px solid var(--amber)}
+
+.flag-block{display:flex;gap:.6rem;padding:.75rem .9rem;border-radius:var(--radius);margin-bottom:.4rem}
+.flag-warn{background:var(--yellow2);border:1px solid rgba(180,140,40,.2)}
+.flag-info{background:var(--blue2);border:1px solid rgba(58,114,184,.2)}
+.flag-icon{font-size:13px;flex-shrink:0}
+.flag-txt{font-size:12px;color:var(--text2);line-height:1.5}
+.flag-txt strong{color:var(--text);font-weight:500}
+
+.road-ver{font-size:10px;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:.07em;padding:.5rem 0 .3rem;border-top:1px solid var(--border);margin-top:.5rem;display:flex;align-items:center;gap:.5rem}
+.road-ver-sep{flex:1;height:1px;background:var(--border)}
+.road-item{display:flex;gap:.5rem;font-size:12.5px;padding:.3rem 0}
+.road-item::before{content:'→';color:var(--text4);flex-shrink:0}
+.ri-n{color:var(--text);font-weight:500;margin-right:.25rem}
+.ri-w{color:var(--text3)}
+
+/* ── PHASE 3 AGENT ── */
+.agent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+.ag-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;cursor:pointer;transition:all .15s;position:relative}
+.ag-card:hover{border-color:var(--border2);background:var(--bg4)}
+.ag-card.selected{border-color:var(--amber);background:var(--amber4)}
+.ag-rec{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--amber);color:#fff;font-size:9px;font-weight:500;padding:2px 9px;border-radius:10px;white-space:nowrap;letter-spacing:.03em}
+.ag-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.ag-type{font-size:10.5px;margin-bottom:.5rem;font-weight:500}
+.ag-type.step{color:var(--green)}
+.ag-type.shot{color:var(--blue);opacity:.9}
+.ag-desc{font-size:11.5px;color:var(--text3);line-height:1.45}
+
+.meaning-box{background:var(--amber4);border:1px solid rgba(212,98,26,.2);border-radius:var(--radius);padding:.875rem 1rem;font-size:13px;color:var(--text2);line-height:1.6}
+
+/* ── PHASE 4 STACK ── */
+.stack-row{display:grid;grid-template-columns:90px 140px 1fr;gap:.75rem;align-items:start;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.stack-row:last-child{border-bottom:none}
+.sr-layer{font-size:10px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;padding-top:3px}
+.sr-choice{font-size:13px;font-weight:500;color:var(--text)}
+.sr-reason{font-size:12px;color:var(--text3);line-height:1.45}
+.view-toggle{font-size:11px;color:var(--amber2);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0}
+
+.arch-page{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);padding:.3rem .625rem;background:var(--bg3);border-radius:5px;margin-bottom:3px}
+.dm-row{display:grid;grid-template-columns:110px 1fr 130px;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--border);font-size:12px}
+.dm-row:last-child{border-bottom:none}
+.dm-tbl{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--text)}
+.dm-flds{color:var(--text3);line-height:1.4}
+.dm-rel{color:var(--text4);font-style:italic}
+
+/* ── PHASE 5 CHUNKS ── */
+.chunk-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:.5rem;overflow:hidden;cursor:pointer;transition:border .15s}
+.chunk-card:hover{border-color:var(--border2)}
+.chunk-card.open{border-color:var(--amber)}
+.chunk-hdr{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.1rem}
+.chunk-num{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--text3);flex-shrink:0;transition:all .2s}
+.chunk-card.open .chunk-num{background:var(--amber);color:#fff;border-color:var(--amber)}
+.chunk-ttl{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.chunk-cx{font-size:10px;font-weight:500;padding:2px 7px;border-radius:8px}
+.chunk-body{padding:0 1.1rem 1rem;border-top:1px solid var(--border);display:none;background:var(--bg3)}
+.chunk-card.open .chunk-body{display:block}
+.chunk-delivers{font-size:12.5px;color:var(--text2);line-height:1.55;padding:.875rem 0 .625rem;border-bottom:1px solid var(--border)}
+.chunk-deps{font-size:11px;color:var(--text4);padding:.5rem 0;border-bottom:1px solid var(--border)}
+.chunk-cl{padding:.625rem 0}
+.cl-item{display:flex;align-items:flex-start;gap:.5rem;padding:.25rem 0;font-size:12px;color:var(--text3)}
+.cl-item::before{content:"□";color:var(--text4);flex-shrink:0;margin-top:1px;font-family:'JetBrains Mono',monospace}
+
+.gran-wrap{margin:1rem 0}
+.gran-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--text4);margin-top:.375rem}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bg5);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--amber);cursor:pointer;border:2px solid var(--bg)}
+
+/* ── PHASE 6 PROMPTS ── */
+.prompt-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:.5rem;overflow:hidden}
+.prompt-block.open{border-color:var(--amber)}
+.prompt-hdr{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.1rem;cursor:pointer;transition:background .15s}
+.prompt-hdr:hover{background:var(--bg4)}
+.prompt-cnum{width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.prompt-ttl{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.copy-btn{font-size:11px;font-weight:500;color:var(--text3);background:var(--bg4);border:1px solid var(--border);padding:4px 11px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.copy-btn:hover{background:var(--bg5);color:var(--text)}
+.copy-btn.done{color:var(--green);background:var(--green2);border-color:rgba(58,138,90,.3)}
+.prompt-body{display:none;padding:0 1.1rem 1rem;border-top:1px solid var(--border);background:var(--bg3)}
+.prompt-block.open .prompt-body{display:block}
+.prompt-txt{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text2);line-height:1.75;white-space:pre-wrap;word-break:break-word;padding:.875rem 0}
+
+.prompt-tip{background:var(--amber4);border:1px solid rgba(212,98,26,.2);border-radius:var(--radius);padding:.875rem 1rem;display:flex;gap:.75rem;margin-bottom:1rem}
+.prompt-tip-icon{font-size:16px;flex-shrink:0}
+.prompt-tip-body{font-size:12.5px;color:var(--text2);line-height:1.55}
+.prompt-tip-body strong{color:var(--amber2);font-weight:500}
+
+/* ── PHASE 7 LAUNCH ── */
+.lc-cat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:.5rem;overflow:hidden}
+.lc-hdr{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.1rem;background:var(--bg3);border-bottom:1px solid var(--border)}
+.lc-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.lc-badge-req{font-size:10px;font-weight:500;color:var(--red);background:var(--red2);padding:2px 8px;border-radius:8px;border:1px solid rgba(192,64,64,.2)}
+.lc-badge-opt{font-size:10px;color:var(--text4)}
+.lc-items{padding:.5rem .875rem}
+.lc-item{display:flex;align-items:flex-start;gap:.75rem;padding:.625rem .375rem;border-bottom:1px solid var(--border)}
+.lc-item:last-child{border-bottom:none}
+.lc-cb{width:15px;height:15px;border-radius:3px;border:1px solid var(--border2);flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--bg4)}
+.lc-cb.on{background:var(--green);border-color:var(--green)}
+.lc-cb.on::after{content:'✓';color:#fff;font-size:9px;font-weight:600}
+.lc-task{font-size:13px;color:var(--text);cursor:pointer;line-height:1.45}
+.lc-task.done{text-decoration:line-through;color:var(--text4)}
+.lc-explain{font-size:11.5px;color:var(--text3);margin-top:3px;line-height:1.45}
+
+.progress-ring-wrap{display:flex;align-items:center;gap:1.25rem;padding:.875rem 1.1rem;background:var(--bg3);border-radius:var(--radius-lg);margin-bottom:.875rem}
+.pct-label{font-size:28px;font-family:'Instrument Serif',serif;color:var(--text)}
+.pct-sub{font-size:12px;color:var(--text3)}
+.prog-bar{flex:1;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden}
+.prog-fill{height:4px;background:var(--amber);border-radius:2px;transition:width .4s}
+
+.roadmap-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem}
+.roadmap-title{font-size:12px;font-weight:500;color:var(--green);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.roadmap-title::after{content:'';flex:1;height:1px;background:rgba(58,138,90,.2)}
+.rm-item{display:flex;align-items:center;gap:.75rem;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.rm-item:last-child{border-bottom:none}
+.rm-ver{font-size:10px;font-weight:500;color:var(--green);background:var(--green2);padding:2px 7px;border-radius:6px;flex-shrink:0}
+.rm-name{color:var(--text);flex:1}
+.rm-why{font-size:11.5px;color:var(--text4)}
+
+/* md export preview */
+.md-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);line-height:1.7;max-height:180px;overflow-y:auto;white-space:pre;margin-bottom:1rem}
+.mdc-yaml{color:var(--amber2)}
+.mdc-h1{color:var(--text);font-weight:500}
+.mdc-h2{color:var(--text2)}
+.mdc-val{color:var(--green)}
+
+/* misc */
+.divider{height:1px;background:var(--border);margin:1.25rem 0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
+.hidden{display:none!important}
+.ext-svc{display:flex;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2);align-items:flex-start}
+.ext-svc::before{content:'→';color:var(--text4);flex-shrink:0}
+.ext-svc:last-child{border-bottom:none}
+.inline-spinner{display:inline-block;width:12px;height:12px;border:1.5px solid var(--border2);border-top-color:var(--amber);border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">vibe<em>studio</em></div>
+  <div class="topbar-sep"></div>
+  <div class="demo-chip">DEMO</div>
+  <div class="idea-switcher" id="idea-switcher">
+    <button class="isw-btn active" onclick="switchIdea('invoice',this)">Invoice Tracker</button>
+    <button class="isw-btn" onclick="switchIdea('apicost',this)">API Cost Monitor</button>
+    <button class="isw-btn" onclick="switchIdea('fitness',this)">Fitness Marketplace</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-pad">
+      <div class="sidebar-section">
+        <div class="sl">Phases</div>
+        <div id="phase-nav"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sl">Decisions</div>
+        <div id="decisions"></div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="main-inner" id="main"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const DATA = {"invoice":{"raw":"I want to help freelancers track their invoices and get paid faster","ideation":{"questions":["Who exactly are the freelancers you have in mind — designers, developers, writers, or someone else?","What do most freelancers do today to send invoices and track payments?","What's the moment a freelancer would think 'this is exactly what I needed'?","What is this product definitely not trying to do?","Are there tools like Wave, FreshBooks, or PayPal invoicing — and what's wrong with them for freelancers?"],"answers":["Mostly independent designers, developers, and consultants — solo operators billing 3 to 10 clients a month","They use Google Docs or Word to make invoices, then email PDFs manually and chase clients over WhatsApp","When they send an invoice and get a notification that the client has viewed it — and another when they get paid","Not accounting, not tax filing, not team features — just the invoicing and payment tracking loop","FreshBooks is too expensive and bloated. Wave is free but clunky. PayPal feels unprofessional. None feel made for solo freelancers"],"kernel":{"problem":"Freelancers lose time and money chasing unpaid invoices because their tools are too complex, too expensive, or not built for solo operators","solution":"A lightweight invoicing tool that lets freelancers create, send, and track invoices — and get paid — without the overhead of full accounting software","target_user":"Solo freelancers billing 3–10 clients a month who currently use Word, Google Docs, or email to manage invoicing","value_prop":"Purpose-built for solo freelancers — simpler than FreshBooks, more professional than PayPal, and free to start","out_of_scope":"Tax filing, payroll, team collaboration, expense tracking, accounting reports","success_metric":"A freelancer creates and sends their first invoice in under 3 minutes and receives payment without a follow-up email"},"analysis":[{"type":"strong","title":"Laser-focused problem","detail":"Chasing unpaid invoices is a universal freelancer pain — frequent, financially significant, and frustrating."},{"type":"strong","title":"Clear out-of-scope boundary","detail":"Excluding accounting keeps the MVP tight. This discipline will save months of build time."},{"type":"strong","title":"Strong differentiation angle","detail":"The gap between 'too simple' (PayPal) and 'too complex' (FreshBooks) is real and well-articulated."},{"type":"weak","title":"Target user is still broad","detail":"Designers, developers, and consultants have different needs. Narrowing to one type for launch makes marketing much easier."},{"type":"weak","title":"Payment integration adds complexity","detail":"'Get paid faster' implies Stripe integration, payout delays, and fee structures. Scope carefully."},{"type":"risk","title":"Validate willingness to pay","detail":"Wave is free and does much of this. Talk to 5 freelancers before building to confirm they'd pay for a better experience."}]},"features":{"core":[{"name":"Invoice creation","description":"Create professional invoices with line items, quantities, rates, and tax","complexity":"moderate","why":"The core action — nothing works without this"},{"name":"Client management","description":"Save client details so you don't re-enter them every time","complexity":"simple","why":"Essential for repeat billing"},{"name":"Invoice sending","description":"Send invoices via email directly from the app with a payment link","complexity":"moderate","why":"Replaces the manual PDF email workflow"},{"name":"Payment tracking","description":"See which invoices are unpaid, viewed, overdue, or paid","complexity":"simple","why":"The status dashboard saves freelancers from chasing manually"},{"name":"Stripe payment integration","description":"Clients pay directly via card through a hosted payment page","complexity":"complex","why":"The 'get paid faster' promise requires real payment processing"}],"should_have":[{"name":"Automated payment reminders","description":"Send automatic follow-up emails when invoices go overdue","complexity":"moderate","why":"Eliminates the awkward manual chase"},{"name":"Invoice PDF download","description":"Download a clean PDF version of any invoice","complexity":"simple","why":"Some clients require PDFs for their accounting"},{"name":"Dashboard overview","description":"Home screen showing total outstanding, paid this month, and overdue amounts","complexity":"simple","why":"Instant financial visibility without digging"}],"nice_to_have":[{"name":"Custom branding","description":"Add your logo and brand colours to invoices","complexity":"simple","why":"Professional but not essential for core value"},{"name":"Invoice templates","description":"Save reusable invoice templates for recurring project types","complexity":"simple","why":"Speeds up creation for power users"}],"roadmap":[{"name":"Recurring invoices","version":"v2","why_parked":"Adds scheduling logic and subscription state — too complex for day one"},{"name":"Multi-currency support","version":"v2","why_parked":"Requires exchange rate handling and Stripe currency configs"},{"name":"Accounting integrations","version":"v3","why_parked":"QuickBooks and Xero sync is complex and outside the core MVP"},{"name":"Client portal","version":"v3","why_parked":"A dedicated client view with invoice history is far beyond day-one scope"}],"pressure_flags":[{"feature":"Stripe payment integration","flag":"Complex feature involving webhook handling, payout schedules, and fee structures. Consider launching with a payment link only (no embedded checkout) to reduce complexity.","severity":"warning"},{"feature":"Automated payment reminders","flag":"Requires a background job system and email deliverability setup — budget extra time.","severity":"info"}]},"agent":{"recommended":"cursor","what_it_means":"Because you chose Cursor, your build will be broken into focused chunks — one feature at a time, working inside your codebase. Each prompt references specific files and folders, giving you full control to course-correct at every step."},"stack":{"layers":[{"layer":"Frontend","choice":"Next.js","reason":"SSR, file-based routing, great DX","plain_english":"Next.js handles both what your users see and the logic behind the scenes in one place — less to set up, fewer moving parts."},{"layer":"Backend","choice":"Next.js API Routes","reason":"Co-located with frontend, no separate server","plain_english":"Your backend logic lives in the same project as your frontend — no need to manage a separate server."},{"layer":"Database","choice":"Supabase (PostgreSQL)","reason":"Managed Postgres with real-time and built-in auth","plain_english":"Supabase is a database with superpowers — it stores your data, handles logins, and lets you query everything easily."},{"layer":"Auth","choice":"Supabase Auth","reason":"Included in Supabase, handles email/OAuth","plain_english":"Since we're already using Supabase, its built-in login system means one less thing to set up."},{"layer":"Email","choice":"Resend","reason":"Developer-friendly, great deliverability, simple API","plain_english":"Resend sends emails on your behalf — invoice notifications, payment reminders — without landing in spam."},{"layer":"Payments","choice":"Stripe","reason":"Industry standard, best docs, handles payouts","plain_english":"Stripe lets your clients pay by card. The most trusted payment tool in the world."},{"layer":"Hosting","choice":"Vercel","reason":"Made for Next.js, free tier, instant deploys","plain_english":"Vercel puts your app on the internet in one click. Made by the same team as Next.js so everything just works."}],"architecture":{"pages":["/ — Landing page and login","/dashboard — Outstanding, paid, and overdue overview","/invoices — Full invoice list with filters","/invoices/new — Create a new invoice","/invoices/[id] — View and manage a single invoice","/clients — Client list and profiles","/clients/[id] — Client with invoice history","/settings — Profile, branding, and Stripe connection"],"data_model":[{"table":"users","fields":["id","email","full_name","business_name","logo_url","stripe_account_id","created_at"],"relates_to":"owns clients and invoices"},{"table":"clients","fields":["id","user_id","name","email","company","address","created_at"],"relates_to":"belongs to user, has many invoices"},{"table":"invoices","fields":["id","user_id","client_id","invoice_number","status","due_date","total","currency","sent_at","paid_at","created_at"],"relates_to":"belongs to user and client, has many line items"},{"table":"invoice_items","fields":["id","invoice_id","description","quantity","rate","amount"],"relates_to":"belongs to invoice"}],"auth_flow":"User signs up with email and password via Supabase Auth. A session is created on login and stored in a cookie. All API routes verify the session. Clients never log in — they receive a unique payment link via email.","external_services":["Stripe — payment processing and payout management","Resend — transactional email for invoice delivery and reminders","Supabase Storage — logo and attachment uploads"]}},"chunks":[{"id":1,"title":"Project scaffold and setup","feature":"Foundation","depends_on":[],"delivers":"A working Next.js app with Supabase connected, env vars configured, and basic routing in place","complexity":"simple","done_when":["App runs locally without errors","Supabase connection works","Environment variables documented in .env.example","Basic folder structure matches architecture plan"]},{"id":2,"title":"Authentication","feature":"Auth","depends_on":[1],"delivers":"Users can sign up, log in, and log out. Protected routes redirect unauthenticated users to login","complexity":"moderate","done_when":["Sign up with email and password works","Login works and creates a session","Logout clears the session","Visiting /dashboard without a session redirects to /login"]},{"id":3,"title":"Client management","feature":"Client management","depends_on":[1,2],"delivers":"Users can create, view, edit, and delete clients. Data is saved to Supabase and scoped to the logged-in user","complexity":"simple","done_when":["Client list shows all clients for the logged-in user","Create client form saves to Supabase","Edit and delete both work","Clients from other users are not visible"]},{"id":4,"title":"Invoice creation and management","feature":"Invoice creation","depends_on":[1,2,3],"delivers":"Users can create invoices with line items, assign them to a client, and view them in a list","complexity":"moderate","done_when":["Create invoice form works with dynamic line items","Invoice totals calculate correctly","Invoice saved to Supabase","Invoice list shows all invoices with status badges","Invoice detail page shows full invoice"]},{"id":5,"title":"Invoice sending via email","feature":"Invoice sending","depends_on":[1,2,3,4],"delivers":"Users can send an invoice to a client by email. The client receives a professional email with a link to view and pay","complexity":"moderate","done_when":["Send button triggers Resend email to the client","Email contains invoice details and a view link","Invoice status updates to sent","Sent timestamp is recorded"]},{"id":6,"title":"Stripe payment integration","feature":"Stripe payment integration","depends_on":[1,2,3,4,5],"delivers":"Clients can pay invoices via card through a Stripe-hosted payment page. Status updates automatically via webhook","complexity":"complex","done_when":["Stripe Checkout session created on invoice view","Client can complete a card payment","Webhook receives payment confirmation","Invoice status updates to paid automatically","Paid timestamp recorded"]},{"id":7,"title":"Dashboard and payment tracking","feature":"Payment tracking","depends_on":[1,2,3,4,5,6],"delivers":"A dashboard showing total outstanding, paid this month, overdue invoices, and a filtered invoice list","complexity":"moderate","done_when":["Dashboard shows correct totals","Outstanding amount is accurate","Overdue invoices correctly identified","Invoice list can be filtered by status","Data scoped to the logged-in user only"]}],"prompts":[{"chunk_id":1,"prompt":"Set up a new Next.js 14 project using the App Router. Install and configure Supabase using the @supabase/ssr package for server-side session management. Create a Supabase project and add the following environment variables to .env.local: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY (placeholder), STRIPE_SECRET_KEY (placeholder).\n\nCreate the folder structure: /app for pages, /components for reusable UI, /lib for utility functions and Supabase clients, /types for TypeScript interfaces. Create a Supabase client helper in /lib/supabase that exports both a browser client and a server client.\n\nInstall Tailwind CSS and configure it. Set up a basic layout in app/layout.tsx with a clean sans-serif font. Create placeholder pages for /dashboard, /invoices, /clients, and /settings that render their route name so we can confirm routing works.\n\nCreate a .env.example file listing all required environment variables with empty values and descriptions. The app should run locally with no errors when done."},{"chunk_id":2,"prompt":"Implement authentication using Supabase Auth with email and password. Create /login (email + password form) and /signup (email, password, full name, and business name). On signup, save full_name and business_name to a users table in Supabase in addition to creating the auth user.\n\nCreate middleware.ts in the project root that checks for a valid Supabase session on every request. Redirect unauthenticated users to /login when accessing /dashboard, /invoices, /clients, or /settings. Redirect authenticated users away from /login and /signup to /dashboard.\n\nCreate a navigation component that shows the user's business name and a logout button. Clicking logout calls Supabase signOut and redirects to /login. Use Supabase server-side session handling — do not store session state in localStorage.\n\nUsers table schema: id (uuid, references auth.users), email, full_name, business_name, logo_url (nullable), stripe_account_id (nullable), created_at. Enable Row Level Security so users can only read and update their own row."},{"chunk_id":3,"prompt":"Build client management. Create a clients table: id (uuid), user_id (references users.id), name, email, company (nullable), address (nullable), created_at. Enable RLS so users only see and modify their own clients.\n\nBuild /clients page showing all clients for the logged-in user as cards with name, company, and email. Include a Create Client button that opens a slide-over form with fields: name (required), email (required), company (optional), address (optional). On submit, save to Supabase and refresh the list.\n\nEach card has an Edit button (opens pre-filled form) and a Delete button (shows confirmation dialog). Clicking a client name navigates to /clients/[id] showing client details and a placeholder invoice section.\n\nAll operations scoped to the logged-in user via user_id. If a user tries to access another user's client directly via URL, return a 404."},{"chunk_id":4,"prompt":"Build invoice creation and management. Create two tables.\n\nInvoices: id (uuid), user_id, client_id, invoice_number (auto-incremented per user in format INV-001), status (enum: draft/sent/viewed/paid/overdue), due_date, subtotal, tax_rate (default 0), tax_amount, total, currency (default USD), notes (nullable), sent_at (nullable), paid_at (nullable), created_at. Enable RLS.\n\nInvoice_items: id (uuid), invoice_id, description, quantity (numeric), rate (numeric), amount (computed). Enable RLS.\n\nBuild /invoices showing all invoices in a table: invoice number, client name, amount, status badge (draft=grey, sent=blue, viewed=amber, paid=green, overdue=red), due date, and actions.\n\nBuild /invoices/new with: client selector dropdown, due date picker, currency selector, notes field, and dynamic line items (description, quantity, rate, calculated amount). Show running subtotal, tax rate, and total.\n\nBuild /invoices/[id] showing the full invoice in a clean printable layout with Send, Download PDF, and Mark as Paid buttons."},{"chunk_id":5,"prompt":"Implement invoice sending via email using Resend. Create a POST endpoint at /api/invoices/[id]/send that: validates the user owns the invoice, sends an HTML email to the client via Resend, updates invoice status to sent, and records sent_at.\n\nThe HTML email includes: freelancer's business name, invoice number, total, due date, line item summary, and a prominent CTA button linking to /invoice/[id] (public, no auth required).\n\nCreate the public /invoice/[id] page showing the invoice in a clean professional layout with freelancer name at top, all line items, totals, and a placeholder Pay Now button. No authentication required.\n\nAfter sending, show a success toast and update the status badge on the list. If already sent, show a warning before resending."},{"chunk_id":6,"prompt":"Integrate Stripe for client payments. Install the Stripe Node.js SDK and @stripe/stripe-js.\n\nOn the public /invoice/[id] page, wire up the Pay Now button to call /api/invoices/[id]/checkout. This endpoint: verifies the invoice is not already paid, creates a Stripe Checkout Session with the invoice total, passes invoice_id in session metadata, sets success_url to /invoice/[id]/success and cancel_url back to /invoice/[id], and returns the checkout URL.\n\nCreate a Stripe webhook at /api/webhooks/stripe listening for checkout.session.completed. When received: find the invoice by invoice_id in session metadata, update status to paid, record paid_at as current timestamp.\n\nCreate /invoice/[id]/success showing a thank you message and confirmed payment amount. Add STRIPE_WEBHOOK_SECRET to env vars. Test the full flow: send invoice → client clicks Pay Now → Stripe Checkout → webhook fires → invoice marked paid."},{"chunk_id":7,"prompt":"Build the dashboard and complete payment tracking. The /dashboard page shows four metric cards: Total outstanding (sum of sent/viewed/overdue invoices), Paid this month (sum of invoices paid in the current calendar month), Overdue (count of invoices past due date not paid), Total clients. Below metrics, show a table of the 5 most recent invoices with status.\n\nUpdate /invoices to support status filtering via tab buttons: All, Draft, Sent, Overdue, Paid. Overdue filter shows invoices where due_date is in the past and status is not paid.\n\nOn /clients/[id], populate the invoice history section: all invoices for that client with number, amount, status, and date. Add total billed and total paid summary at the top.\n\nCreate /api/jobs/mark-overdue (manual trigger for now) that updates sent/viewed invoices past their due date to overdue status. All dashboard data fetched server-side, scoped to the logged-in user."}],"launch_checklist":{"categories":[{"name":"Environment","mandatory":true,"items":[{"task":"All environment variables set in Vercel production settings","explanation":"Your app needs these secret keys to connect to Supabase, Stripe, and Resend. Without them, the app will crash on first load."},{"task":".env.example committed to repo with all keys listed (no values)","explanation":"This tells any future developer exactly what environment variables are needed to run the app."},{"task":"NEXT_PUBLIC_ variables confirmed correct for production domain","explanation":"Public variables are baked into your frontend build. If they point to dev URLs, your production app will talk to your dev database."}]},{"name":"Database","mandatory":false,"items":[{"task":"Row Level Security enabled on all Supabase tables","explanation":"RLS ensures users can only see their own data. Without it, any logged-in user could query any other user's invoices."},{"task":"Production Supabase project is separate from development","explanation":"Using the same database for dev and production means test data pollutes real user data."}]},{"name":"Auth","mandatory":true,"items":[{"task":"Supabase Auth redirect URLs updated to production domain","explanation":"Supabase sends confirmation emails with links. If still pointing to localhost, users can't verify their email."},{"task":"Email confirmation enabled for new signups","explanation":"Prevents fake email signups and ensures you can contact your users reliably."}]},{"name":"Payments","mandatory":false,"items":[{"task":"Stripe live mode keys configured (not test mode)","explanation":"Test mode keys process fake payments. You need live keys for real money to move."},{"task":"Stripe webhook endpoint registered for production URL","explanation":"Stripe sends payment confirmations to your webhook. If it points to localhost, invoices will never get marked as paid."},{"task":"End-to-end payment tested with a real card","explanation":"Do one real test payment before launch to confirm the full flow works in production."}]},{"name":"Security","mandatory":true,"items":[{"task":"No API keys or secrets in frontend code or git history","explanation":"Exposed keys can lead to your Stripe account being drained. Run a quick scan with git-secrets or truffleHog."},{"task":"All private routes tested without a session","explanation":"Visit /dashboard, /invoices, and /clients in an incognito window without logging in. You should be redirected to /login every time."},{"task":"Public invoice page only shows invoice data, no user data","explanation":"The /invoice/[id] page is accessible without login. It must not expose the freelancer's email, Stripe ID, or other sensitive data."}]},{"name":"Launch","mandatory":false,"items":[{"task":"Custom domain connected and SSL active","explanation":"A .vercel.app domain works but looks unprofessional. Connect your own domain — Vercel handles the SSL certificate automatically."},{"task":"App tested on mobile (invoice creation and payment flow)","explanation":"Your clients may pay invoices on their phone. The payment flow must work smoothly on a small screen."},{"task":"Error states handled — empty states, failed sends, failed payments","explanation":"Test what happens when Resend fails, Stripe declines a card, or a user has no clients yet."}]}]}},"apicost":{"raw":"A developer tool that monitors API costs across multiple providers and alerts when you're close to budget","ideation":{"questions":["Which AI providers do you have in mind — OpenAI, Anthropic, Google, or others?","What does a developer do today to track their API costs across multiple providers?","What's the first moment a developer would think 'this just saved me money'?","What is this tool definitely not trying to do?","Are there existing tools like this — and what's missing from them?"],"answers":["Mainly OpenAI and Anthropic, but ideally any provider with a public API cost structure","They log into each provider dashboard separately, manually compare, and sometimes get surprise bills at the end of the month","When they get an alert before hitting their budget — and can see exactly which model is burning the most tokens","Not a full observability platform, not LLM evaluation, not prompt management — purely cost monitoring and alerting","Langfuse and Helicone exist but they're heavy and focused on tracing, not cost budgeting for indie developers"],"kernel":{"problem":"Developers building with multiple AI providers get surprise bills because there's no single place to monitor spend and get warned before budgets are exceeded","solution":"A lightweight dashboard that aggregates API costs across providers, sets budget thresholds, and alerts developers before they overspend","target_user":"Solo developers and small teams building AI-powered products who use 2+ LLM providers and want cost visibility without a full observability stack","value_prop":"The simplest way to never get a surprise AI bill — one dashboard, all providers, budget alerts before you overspend","out_of_scope":"Prompt tracing, LLM evaluation, team billing management, model fine-tuning cost tracking","success_metric":"A developer connects their first provider and sees their current month spend within 60 seconds — and receives their first budget alert before going over"},"analysis":[{"type":"strong","title":"Pain is real and recurring","detail":"Surprise AI bills are a documented frustration in developer communities. The problem happens every billing cycle."},{"type":"strong","title":"Clear technical differentiation","detail":"Existing tools focus on tracing and evaluation. A cost-first, alert-first tool for indie developers is a genuinely different product."},{"type":"strong","title":"Natural word-of-mouth potential","detail":"Developers share tools that save them money. A tweet saying 'this saved me $200 last month' drives significant organic growth."},{"type":"weak","title":"API access model needs validation","detail":"Some providers don't expose real-time cost APIs — you may need to approximate from token counts. Validate before building."},{"type":"weak","title":"Provider list scope","detail":"Supporting every AI provider is a long tail of integration work. Be explicit about which providers ship at v1."},{"type":"risk","title":"API key security is critical","detail":"Users give you their provider API keys for cost fetching. Security architecture and key storage must be bulletproof from day one."}]},"features":{"core":[{"name":"Provider connection","description":"Connect OpenAI and Anthropic accounts via API key to pull usage data","complexity":"moderate","why":"No data without provider connections — this is the foundation"},{"name":"Cost dashboard","description":"Real-time view of spend per provider, per model, and per day for the current billing period","complexity":"moderate","why":"The core visibility feature — the entire product lives here"},{"name":"Budget threshold alerts","description":"Set a monthly budget per provider and receive an email alert at 80% and 100%","complexity":"moderate","why":"The core promise — alerting before overspend"},{"name":"Usage history","description":"30-day and 90-day historical cost charts per provider","complexity":"simple","why":"Context for current spend — hard to interpret today's cost without history"},{"name":"Encrypted API key storage","description":"Securely encrypt and store provider API keys used for cost polling","complexity":"complex","why":"Non-negotiable — storing API keys insecurely would be catastrophic for users"}],"should_have":[{"name":"Cost breakdown by model","description":"See which specific models are driving the most cost","complexity":"simple","why":"Model-level granularity is where the actionable insights live"},{"name":"Daily cost email digest","description":"Optional daily email showing yesterday's spend across all providers","complexity":"simple","why":"Keeps costs top of mind without needing to log in"},{"name":"Spend projections","description":"Project end-of-month spend based on current daily average","complexity":"simple","why":"Makes budget alerts more useful — 'at this rate you'll hit your limit in 5 days'"}],"nice_to_have":[{"name":"Slack alerts","description":"Send budget alerts to a Slack channel","complexity":"simple","why":"Developers live in Slack — this is where they want alerts"},{"name":"Cost per project tagging","description":"Tag API usage to different projects","complexity":"complex","why":"Very useful for developers with multiple products but requires instrumentation changes"}],"roadmap":[{"name":"Google Gemini and Mistral support","version":"v2","why_parked":"Additional provider integrations after OpenAI and Anthropic are solid"},{"name":"Team workspaces","version":"v2","why_parked":"Sharing dashboards across a team requires roles, permissions, and billing — post-MVP"},{"name":"API cost per feature tracking","version":"v3","why_parked":"Requires SDK instrumentation from the user's app — significant implementation burden"},{"name":"Cost anomaly detection","version":"v3","why_parked":"ML-based anomaly detection is a separate product feature with significant complexity"}],"pressure_flags":[{"feature":"Encrypted API key storage","flag":"Use envelope encryption with a KMS like Supabase Vault — never store keys in plain text in your database.","severity":"warning"},{"feature":"Cost dashboard","flag":"OpenAI and Anthropic have different API structures for usage data. Validate that both return the granularity you need before designing the data model.","severity":"info"}]},"agent":{"recommended":"claude_code","what_it_means":"Because you chose Claude Code, your build will use larger, more autonomous chunks. Claude Code handles multi-file tasks end to end — each chunk is a feature brief rather than a single file edit. Fewer sessions, more accomplished per session."},"stack":{"layers":[{"layer":"Frontend","choice":"Next.js","reason":"App Router, server components, great for data-heavy dashboards","plain_english":"Next.js lets us build a fast, server-rendered dashboard that loads cost data quickly."},{"layer":"Backend","choice":"Next.js API + Vercel Cron","reason":"Cron jobs needed for scheduled provider polling","plain_english":"We fetch your cost data from providers automatically every hour. Vercel's built-in cron jobs handle this without a separate server."},{"layer":"Database","choice":"Supabase (PostgreSQL)","reason":"Time-series cost data, RLS for isolation, Vault for key storage","plain_english":"Supabase stores historical cost data and uses its Vault feature to keep your API keys encrypted and safe."},{"layer":"Auth","choice":"Supabase Auth (GitHub)","reason":"GitHub OAuth preferred by developers","plain_english":"Developers can sign in with GitHub — no new password to remember, 10 seconds to get started."},{"layer":"Email","choice":"Resend","reason":"Clean API, great for transactional alerts","plain_english":"Resend sends budget alerts and daily digest emails reliably without landing in spam."},{"layer":"Payments","choice":"Stripe","reason":"Subscription billing for paid tiers","plain_english":"Stripe handles paid plan subscriptions — takes a card, charges monthly, handles cancellations."},{"layer":"Hosting","choice":"Vercel","reason":"Native Next.js support, cron jobs, edge functions","plain_english":"Vercel hosts the app and runs the hourly polling jobs. Optimised for Next.js with a generous free tier."}],"architecture":{"pages":["/ — Landing page with GitHub login","/dashboard — Cost overview across all providers","/providers — Manage connected providers and API keys","/providers/[id] — Detailed cost breakdown for one provider","/alerts — Budget configuration and alert history","/settings — Account settings and subscription management"],"data_model":[{"table":"users","fields":["id","email","github_username","plan","created_at"],"relates_to":"owns provider connections and budgets"},{"table":"provider_connections","fields":["id","user_id","provider","encrypted_api_key","last_synced_at","is_active","created_at"],"relates_to":"belongs to user, has many cost records"},{"table":"cost_records","fields":["id","connection_id","user_id","provider","model","date","tokens_input","tokens_output","cost_usd","created_at"],"relates_to":"belongs to provider connection, used for dashboard aggregations"},{"table":"budgets","fields":["id","user_id","connection_id","monthly_limit_usd","alert_at_percent","last_alerted_at","created_at"],"relates_to":"belongs to user and provider connection"}],"auth_flow":"User signs in with GitHub OAuth via Supabase Auth. On first login, a user record is created. API keys are stored encrypted using Supabase Vault — the app never handles raw keys after initial entry. A server-side cron job polls provider APIs hourly using decrypted keys server-side only.","external_services":["OpenAI Usage API — fetch token and cost data","Anthropic Usage API — fetch token and cost data","Resend — budget alert and digest emails","Stripe — subscription management for paid tiers"]}},"chunks":[{"id":1,"title":"Project scaffold and auth","feature":"Foundation + Auth","depends_on":[],"delivers":"Next.js app with Supabase connected, GitHub OAuth login working, and protected dashboard route","complexity":"simple","done_when":["App runs locally","GitHub OAuth login works","Session persists on refresh","Visiting /dashboard without login redirects to /"]},{"id":2,"title":"Provider connection and key storage","feature":"Provider connection","depends_on":[1],"delivers":"Users can add OpenAI and Anthropic API keys, encrypted via Supabase Vault. Keys can be deleted but not viewed after entry","complexity":"complex","done_when":["Add provider form accepts API key","Key stored encrypted via Supabase Vault","Provider connection shows as active","Delete removes the key permanently","Raw key never returned from the database"]},{"id":3,"title":"Provider cost polling","feature":"Cost dashboard","depends_on":[1,2],"delivers":"A cron job and manual trigger that fetches cost data from connected providers and stores it in cost_records","complexity":"complex","done_when":["OpenAI usage API polled and data saved correctly","Anthropic usage API polled and data saved correctly","Cost records scoped to the correct user","Manual sync trigger works from the UI","Last synced timestamp updates after each poll"]},{"id":4,"title":"Cost dashboard UI","feature":"Cost dashboard","depends_on":[1,2,3],"delivers":"Dashboard showing total spend this month per provider, a daily cost chart for the last 30 days, and a breakdown by model","complexity":"moderate","done_when":["Total spend per provider is correct","Daily chart renders with correct data","Model breakdown table is accurate","All data scoped to the logged-in user","Dashboard loads in under 2 seconds"]},{"id":5,"title":"Budget configuration","feature":"Budget threshold alerts","depends_on":[1,2],"delivers":"Users can set a monthly budget limit per provider. Budget progress shown as a progress bar on the dashboard","complexity":"simple","done_when":["Budget form saves limit and alert percentage","Budget progress bar shows correctly","Over-budget state is visually distinct","Budget can be edited or deleted"]},{"id":6,"title":"Alert system","feature":"Budget threshold alerts","depends_on":[1,2,3,4,5],"delivers":"When a provider reaches the alert threshold, an email is sent via Resend. Alerts are de-duplicated so users don't get spammed","complexity":"moderate","done_when":["Alert fires when spend crosses configured threshold","Email arrives with correct provider name and figures","Alert not sent again until the next billing period","Alert history logged in the database","Alert can be manually tested from settings"]},{"id":7,"title":"Usage history and projections","feature":"Usage history","depends_on":[1,2,3,4,5,6],"delivers":"90-day historical cost chart per provider, and an end-of-month spend projection based on current daily average","complexity":"simple","done_when":["90-day chart renders correctly per provider","Projection calculation is accurate","Projection shown alongside the budget progress bar","Provider detail page shows model-level breakdown for selected date range"]}],"prompts":[{"chunk_id":1,"prompt":"Create a new Next.js 14 project using the App Router. Set up Supabase using @supabase/ssr for server-side auth. Implement GitHub OAuth login — the landing page should have a 'Sign in with GitHub' button. On successful login, redirect to /dashboard. Create middleware.ts that protects all routes under /dashboard, /providers, /alerts, and /settings. Unauthenticated requests redirect to /.\n\nCreate the Supabase schema for the users table: id (uuid, references auth.users), email, github_username, plan (text, default 'free'), created_at. On first GitHub login, insert a row into users. Set up Row Level Security on users.\n\nInstall Tailwind CSS with a dark theme as default — this is a developer tool and dark mode is expected. Create a persistent sidebar layout for authenticated pages with navigation links to Dashboard, Providers, Alerts, and Settings. Show the GitHub avatar and username in the sidebar footer. Add environment variables for Supabase URL, anon key, and service role key."},{"chunk_id":2,"prompt":"Build provider connection with secure API key storage. Create the provider_connections table: id, user_id, provider (enum: openai, anthropic), encrypted_api_key, last_synced_at (nullable), is_active (boolean, default true), created_at. Enable RLS. Use Supabase Vault (pgsodium) to encrypt the API key before storage — never store in plaintext.\n\nBuild /providers showing connected providers as cards with provider name, status indicator, last synced time, and a Delete button. Add a Connect Provider button that opens a modal with a provider dropdown and API key input. On submit, encrypt the key using Supabase Vault and save.\n\nDelete permanently removes the connection and encrypted key — show a confirmation dialog. The API key input masks the value and never displays it after save. Show only the last 4 characters of the key for reference. Verify that querying the database from the client never returns the raw encrypted key."},{"chunk_id":3,"prompt":"Build the cost polling system. Create the cost_records table: id, connection_id, user_id, provider, model (text), date (date), tokens_input (bigint), tokens_output (bigint), cost_usd (numeric 10,6), created_at. Enable RLS.\n\nCreate /api/sync/[connectionId] that: retrieves and decrypts the API key using Supabase Vault server-side, calls the provider's usage API, transforms the response into cost_records rows, upserts records (to handle re-polling the same day), and updates last_synced_at on the connection.\n\nFor OpenAI: use the /v1/usage endpoint filtered by date range. For Anthropic: use the /v1/usage endpoint. Handle rate limiting and API errors gracefully — log errors but don't crash. Create a vercel.json cron job calling /api/sync/all every hour. /api/sync/all loops through all active connections for all users and triggers individual syncs. Add a manual Sync Now button on the /providers page."},{"chunk_id":4,"prompt":"Build the cost dashboard UI at /dashboard. Fetch cost data from cost_records server-side, scoped to the logged-in user. Display: four metric cards (total spend this month, most expensive provider, most expensive model, total API calls this month), a line chart showing daily total spend for the last 30 days using Recharts, and a table showing spend broken down by model across all providers with columns for provider, model, total tokens, and total cost.\n\nOn /providers/[id], show: daily spend chart (30 days), model breakdown table, and a date range selector. All monetary values formatted as USD with 4 decimal places. Include a last updated timestamp. If no data exists yet, show an empty state with a Sync Now button."},{"chunk_id":5,"prompt":"Build budget configuration. Create the budgets table: id, user_id, connection_id (unique), monthly_limit_usd (numeric), alert_at_percent (integer, default 80), last_alerted_at (nullable), created_at. Enable RLS.\n\nOn /alerts, show each connected provider with its current month spend and a Set Budget button. Clicking opens a form with a monthly limit input and an alert threshold slider (50%, 70%, 80%, 90%). Save to budgets. Existing budgets show as editable.\n\nOn /dashboard, show a budget progress bar under each provider's metric card. Color-code: green under 70%, amber 70–90%, red over 90%. If no budget is set, show a Set Budget link instead. Clicking the progress bar navigates to /alerts."},{"chunk_id":6,"prompt":"Implement the budget alert email system. After each cost sync, check if the user has a budget set for that connection. Calculate total spend for the current calendar month. If spend as a percentage of the monthly limit has crossed alert_at_percent AND last_alerted_at is null or from a previous calendar month, send an alert email via Resend.\n\nThe email includes: provider name, current month spend in USD, budget limit in USD, percentage used, and a link to the dashboard. After sending, update last_alerted_at to now.\n\nCreate an alert_logs table to log every alert. On /alerts, show alert history per provider with the last 5 alerts. Add a Test Alert button in settings that sends a sample alert email so users can verify delivery."},{"chunk_id":7,"prompt":"Add usage history and spend projections. On each provider detail page, add a date range picker defaulting to 90 days. Fetch cost_records for that range and render a daily spend line chart. Add a toggle to switch between total cost and token count views.\n\nAdd spend projection to the dashboard. For each provider with a budget, calculate: days elapsed in the current month, current total spend, average daily spend, projected end-of-month spend (avg daily × days in month). Show as 'Projected: $X.XX by end of month' — color red if projection exceeds the budget.\n\nAdd a 7-day and 30-day summary section showing spend change week-over-week and month-over-month as percentage deltas with directional arrows. Wrap all chart components in Suspense with skeleton loaders."}],"launch_checklist":{"categories":[{"name":"Environment","mandatory":true,"items":[{"task":"All environment variables set in Vercel production","explanation":"Missing any of these means the app crashes, provider syncs fail silently, or emails don't send."},{"task":"Supabase Vault (pgsodium) enabled on production project","explanation":"This encrypts your users' API keys. If not enabled in production, key storage will fail."},{"task":"Vercel cron job confirmed active in Vercel dashboard","explanation":"The hourly poll is the heartbeat of the product. Verify it's listed as active and has run at least once."}]},{"name":"Database","mandatory":false,"items":[{"task":"RLS verified on cost_records, provider_connections, and budgets","explanation":"These tables contain sensitive financial data. RLS ensures no user can query another user's API costs or keys."},{"task":"Production Supabase project separate from development","explanation":"Mixing dev and production means test syncs pollute real data."}]},{"name":"Auth","mandatory":true,"items":[{"task":"GitHub OAuth app callback URL updated to production domain","explanation":"GitHub OAuth will fail if the callback URL doesn't match. Update this in your GitHub OAuth app settings."},{"task":"Supabase Auth redirect URLs include production domain","explanation":"Without this, Supabase won't accept OAuth callbacks from your production URL and logins will fail."}]},{"name":"Security","mandatory":true,"items":[{"task":"API keys never returned in any API response or logged","explanation":"Audit every API route that touches provider_connections. The encrypted key should never appear in a response body or server log."},{"task":"Service role key not exposed to the client","explanation":"The Supabase service role key bypasses RLS. It must only exist in server-side environment variables — never NEXT_PUBLIC_."},{"task":"Cron endpoints protected against public access","explanation":"The /api/sync/all endpoint should validate a secret cron token header so only Vercel can trigger it."}]},{"name":"Payments","mandatory":false,"items":[{"task":"Stripe live keys configured for paid plan subscriptions","explanation":"Test mode keys mean no real payments are processed. Switch to live keys before accepting paying users."},{"task":"Stripe webhook registered for production URL","explanation":"Subscription events won't update your database unless the webhook points to production."}]},{"name":"Launch","mandatory":false,"items":[{"task":"End-to-end test: connect provider → sync → see data → set budget → trigger alert","explanation":"Walk through the full product flow with a real API key before opening to users."},{"task":"Error monitoring set up (Sentry or similar)","explanation":"Provider API errors and sync failures will happen. You need to know about them before your users do."},{"task":"Rate limit API sync endpoints to prevent abuse","explanation":"A malicious user could trigger thousands of syncs. Add basic rate limiting to /api/sync/* endpoints."}]}]}},"fitness":{"raw":"A platform where local fitness trainers can offer 1-on-1 sessions and clients can book and pay them directly","ideation":{"questions":["Who is the primary user you're designing for first — the trainer or the client?","How do local fitness trainers currently manage bookings and payments?","What's the moment a trainer would think 'this platform is worth it'?","What is this platform definitely not trying to be?","Are there tools like Mindbody or Calendly — and why aren't they enough for this?"],"answers":["The trainer is the one who needs to be acquired first — they bring their clients with them","They use Instagram DMs to get enquiries, WhatsApp to confirm bookings, and bank transfers or cash for payment","When they get their first booking from a new client they didn't know — someone who found them on the platform","Not a gym management system, not group classes, not streaming or virtual sessions — just 1-on-1 in-person booking","Mindbody is built for gyms — way too expensive. Calendly doesn't handle payments or fitness discovery. Nothing is built specifically for independent personal trainers"],"kernel":{"problem":"Independent fitness trainers lose clients and income because they have no professional way to be discovered or booked online — and clients have no easy way to find vetted local trainers","solution":"A two-sided marketplace where trainers list their services and availability, and clients can discover, book, and pay for 1-on-1 sessions in one flow","target_user":"Two users: independent personal trainers (supply side) who manage bookings manually, and fitness clients (demand side) looking for personal training in their area","value_prop":"The easiest way for a personal trainer to get found and booked online — and the simplest way for a client to find a trusted local trainer and book today","out_of_scope":"Group classes, virtual sessions, gym management, nutrition plans, workout tracking, trainer certification","success_metric":"A trainer lists their first session type and receives their first booking from a client they didn't previously know within 7 days of joining"},"analysis":[{"type":"strong","title":"Classic marketplace structure","detail":"Two-sided marketplaces with supply-side discovery and demand-side booking are a proven model. The structure is well understood."},{"type":"strong","title":"Clear cold start strategy","detail":"Acquiring trainers first (supply), then clients (demand) is the right order. Trainers bring their existing clients which seeds the demand side."},{"type":"strong","title":"Real income opportunity for trainers","detail":"A trainer who gets one new client per week through the platform earns hundreds of dollars in additional income — strong retention."},{"type":"weak","title":"Two-sided complexity","detail":"Building for two user types means two onboarding flows, two dashboards, and double the edge cases. Will take longer than a single-user product."},{"type":"weak","title":"Geographic dependency","detail":"The product only works if there are trainers and clients in the same area. Launch needs to be city-specific to create enough density."},{"type":"risk","title":"Payment and cancellation policy","detail":"Who gets paid when a client cancels last minute? Refund policies and dispute resolution need to be clearly defined before launch."}]},"features":{"core":[{"name":"Trainer profiles","description":"Trainers create a public profile with bio, specialities, location, photos, and hourly rate","complexity":"moderate","why":"The supply side of the marketplace — no profiles, no product"},{"name":"Session type listings","description":"Trainers define session types with price and description","complexity":"simple","why":"The bookable unit — clients need to know what they're booking and how much it costs"},{"name":"Availability management","description":"Trainers set their weekly availability by day and time slot","complexity":"complex","why":"Without availability, booking is impossible — this is the scheduling engine"},{"name":"Client discovery and search","description":"Clients browse and search for trainers by location, speciality, and price range","complexity":"moderate","why":"The demand side of the marketplace — how clients find trainers"},{"name":"Session booking flow","description":"Clients select a session type, pick a time slot, and confirm a booking","complexity":"moderate","why":"The core transaction — this is what makes it a marketplace and not a directory"},{"name":"Stripe payment at booking","description":"Clients pay at time of booking. Funds held and released to trainer after session","complexity":"complex","why":"Payment is what separates this from Calendly — and makes it valuable to trainers"}],"should_have":[{"name":"Booking confirmation emails","description":"Both trainer and client receive email confirmation with session details","complexity":"simple","why":"Essential for trust and no-show prevention"},{"name":"Session cancellation flow","description":"Either party can cancel with defined refund rules (full refund 24h+ before, no refund under 24h)","complexity":"moderate","why":"Cancellations will happen — a clear process prevents disputes"},{"name":"Trainer and client reviews","description":"Clients leave a star rating and review after a completed session","complexity":"moderate","why":"Reviews are the trust signal that drives new client bookings"}],"nice_to_have":[{"name":"In-app messaging","description":"Trainers and clients can message each other within the platform","complexity":"complex","why":"Useful but WhatsApp works for MVP — don't build real-time chat from day one"},{"name":"Trainer dashboard analytics","description":"Trainers see total earnings, session count, and rating over time","complexity":"simple","why":"Nice for retention but not critical for launch"}],"roadmap":[{"name":"Package deals (10 sessions for a discount)","version":"v2","why_parked":"Requires subscription-style billing and credit management"},{"name":"Group session booking","version":"v2","why_parked":"Multi-client sessions change booking, payment splitting, and capacity logic significantly"},{"name":"Virtual session support","version":"v3","why_parked":"Video infrastructure is a separate product investment entirely"},{"name":"Trainer certification verification","version":"v3","why_parked":"Manual or automated cert verification adds ops complexity and a trust layer that's post-MVP"}],"pressure_flags":[{"feature":"Availability management","flag":"Scheduling is one of the hardest problems in software. Consider react-big-calendar for the UI and a clear data model for availability vs booked sessions. Timezone handling must be correct from day one.","severity":"warning"},{"feature":"Stripe payment at booking","flag":"Marketplace payments require Stripe Connect — trainers need their own connected Stripe accounts. This is more complex than standard Stripe Checkout. Budget extra time for the Connect onboarding flow.","severity":"warning"}]},"agent":{"recommended":"cursor","what_it_means":"Because you chose Cursor, your build will be broken into focused, file-aware chunks. Given the complexity of this marketplace (two user types, scheduling, Stripe Connect), smaller chunks let you course-correct at each step rather than discovering problems deep into a large session."},"stack":{"layers":[{"layer":"Frontend","choice":"Next.js","reason":"SSR for SEO on trainer profile pages, App Router for clean routing","plain_english":"Trainer profile pages need to show up in Google search results. Next.js renders them server-side so search engines can index them — this is how clients discover trainers organically."},{"layer":"Backend","choice":"Next.js API Routes","reason":"Co-located backend, server actions for forms","plain_english":"All booking logic, payment processing, and availability management run server-side to keep payment data secure."},{"layer":"Database","choice":"Supabase (PostgreSQL)","reason":"Complex relational data (trainers, clients, sessions, availability), RLS for isolation","plain_english":"The booking system involves a lot of connected data — trainers, clients, slots, sessions, payments. Supabase handles all of this with strong security built in."},{"layer":"Auth","choice":"Supabase Auth","reason":"Two user types on one auth system, email/Google login","plain_english":"Both trainers and clients use the same login system. A role field distinguishes them after signup — one less system to manage."},{"layer":"Email","choice":"Resend","reason":"Booking confirmations, cancellation notices, review requests","plain_english":"Every booking triggers multiple emails — confirmation to trainer, confirmation to client, reminder before the session. Resend sends all of these reliably."},{"layer":"Payments","choice":"Stripe Connect","reason":"Marketplace payments require Connect for trainer payouts","plain_english":"Stripe Connect lets clients pay through your platform and automatically splits the payment — your platform fee to you, the trainer's share to them."},{"layer":"Hosting","choice":"Vercel","reason":"Next.js native, great CDN for image-heavy trainer profiles","plain_english":"Trainer profiles have photos. Vercel's global CDN serves these images fast to clients anywhere in the world."}],"architecture":{"pages":["/ — Landing page with location search","/trainers — Browse and filter trainers","/trainers/[slug] — Public trainer profile with booking flow","/book/[sessionId] — Booking confirmation and payment","/dashboard/trainer — Trainer's booking management and earnings","/dashboard/client — Client's upcoming and past sessions","/onboarding/trainer — Multi-step trainer profile setup","/onboarding/stripe — Stripe Connect account setup for trainers"],"data_model":[{"table":"profiles","fields":["id","user_id","role","full_name","avatar_url","bio","city","stripe_account_id","stripe_onboarded","created_at"],"relates_to":"one per user, role determines which dashboard they see"},{"table":"session_types","fields":["id","trainer_id","name","description","duration_minutes","price_cents","is_active","created_at"],"relates_to":"belongs to trainer, bookable by clients"},{"table":"availability_slots","fields":["id","trainer_id","day_of_week","start_time","end_time","is_active"],"relates_to":"defines trainer's recurring weekly availability"},{"table":"bookings","fields":["id","session_type_id","trainer_id","client_id","scheduled_at","price_cents","platform_fee_cents","status","stripe_payment_intent_id","stripe_transfer_id","cancelled_at","created_at"],"relates_to":"core transaction — links trainer, client, session type, and payment"},{"table":"reviews","fields":["id","booking_id","trainer_id","client_id","rating","comment","created_at"],"relates_to":"one per completed booking, drives trainer's public rating"}],"auth_flow":"User signs up and selects their role (trainer or client). A profile row is created with the role field. Middleware checks the role to route to the correct dashboard. Trainers complete multi-step onboarding including Stripe Connect setup. Clients can browse without logging in but must create an account to book.","external_services":["Stripe Connect — marketplace payment splitting and trainer payouts","Resend — booking confirmations, reminders, and review requests","Supabase Storage — trainer profile photos and session images"]}},"chunks":[{"id":1,"title":"Project scaffold, auth, and role-based routing","feature":"Foundation","depends_on":[],"delivers":"Next.js app with Supabase auth, role selection on signup (trainer vs client), and middleware routing each role to their own dashboard","complexity":"moderate","done_when":["Trainer signup creates a trainer profile","Client signup creates a client profile","Middleware routes /dashboard/trainer to trainers only","/dashboard/client to clients only","Cross-role access returns 403"]},{"id":2,"title":"Trainer profile and onboarding","feature":"Trainer profiles","depends_on":[1],"delivers":"Trainers complete multi-step onboarding: bio, specialities, location, and profile photo. Public profile live at /trainers/[slug]","complexity":"moderate","done_when":["Multi-step onboarding saves all fields to Supabase","Profile photo uploads to Supabase Storage","Public profile renders at /trainers/[slug]","Page accessible without login","Slug generated from trainer name and is unique"]},{"id":3,"title":"Session types and availability","feature":"Session type listings + Availability management","depends_on":[1,2],"delivers":"Trainers create session types and set weekly availability by day and time block. Both appear on the public profile","complexity":"complex","done_when":["Session type creation form saves to Supabase","Availability grid lets trainers toggle time slots by day","Availability slots save correctly to the database","Public profile shows session types and available days","Trainer can deactivate a session type without deleting it"]},{"id":4,"title":"Client discovery and trainer search","feature":"Client discovery and search","depends_on":[1,2],"delivers":"A /trainers browse page where clients search by city, filter by speciality and price range, and see trainer cards with rating, price, and available days","complexity":"moderate","done_when":["Trainer list shows all active trainers","City search filters by location","Speciality and price range filters work","Trainer cards show name, photo, rating, and starting price","Clicking a card navigates to the trainer's public profile"]},{"id":5,"title":"Booking flow","feature":"Session booking flow","depends_on":[1,2,3,4],"delivers":"Clients select a session type on a trainer's profile, pick an available date and time slot, and confirm a booking","complexity":"complex","done_when":["Session type selector on trainer profile works","Date picker shows only days trainer is available","Time slot picker shows available times for the selected date","Booking created in Supabase with status pending","Trainer sees the booking in their dashboard","Client sees the booking in their dashboard"]},{"id":6,"title":"Stripe Connect and payment at booking","feature":"Stripe payment at booking","depends_on":[1,2,3,4,5],"delivers":"Trainers complete Stripe Connect onboarding. Clients pay at time of booking — funds held and released to trainer after session is marked complete","complexity":"complex","done_when":["Stripe Connect onboarding flow works for trainers","Booking creation triggers a Stripe PaymentIntent","Client completes payment via Stripe Checkout","Booking status updates to confirmed after payment","Platform fee (10%) deducted from trainer payout","Trainer payout triggered when session is marked complete"]},{"id":7,"title":"Reviews, emails, and cancellation","feature":"Reviews + Emails + Cancellation","depends_on":[1,2,3,4,5,6],"delivers":"Booking confirmation emails to both parties, cancellation with refund logic, and a review prompt after session completion","complexity":"complex","done_when":["Trainer and client receive confirmation email on booking","Cancellation 24h+ before triggers full Stripe refund","Cancellation under 24h triggers no refund","Client receives review request email after session completes","Review form saves rating and comment","Trainer's average rating updates on public profile"]}],"prompts":[{"chunk_id":1,"prompt":"Create a Next.js 14 project with App Router and Supabase. Implement email/password authentication with a role selection step on signup — users choose either 'I am a trainer' or 'I am a client'. On signup, create a profiles row: id, user_id (references auth.users), role ('trainer' or 'client'), full_name, avatar_url (nullable), bio (nullable), city (nullable), stripe_account_id (nullable), stripe_onboarded (boolean, default false), created_at.\n\nCreate middleware.ts that: redirects unauthenticated users to /login from any protected route, redirects trainers from /dashboard/client to /dashboard/trainer, and redirects clients from /dashboard/trainer to /dashboard/client. Create placeholder dashboard pages showing the user's role and name.\n\nInstall Tailwind CSS. Design the landing page with a hero section containing a city search input and a 'Find a trainer' CTA button. The page should look professional — this marketplace needs to earn trust from both trainers and clients on first view."},{"chunk_id":2,"prompt":"Build trainer onboarding and public profile. Create a multi-step onboarding flow at /onboarding/trainer: Step 1 — Basic info (full name, bio up to 300 chars, phone number). Step 2 — Location (city, area/neighbourhood). Step 3 — Specialities (multi-select: Strength Training, HIIT, Weight Loss, Yoga, Pilates, Boxing, Mobility, Sports Performance). Step 4 — Profile photo upload.\n\nStore photos in Supabase Storage under an 'avatars' bucket. Generate a unique slug from the trainer's full name and save it to profiles. Redirect to /dashboard/trainer after onboarding.\n\nBuild the public profile page at /trainers/[slug]. Show: profile photo, full name, city, bio, speciality badges, average star rating (placeholder for now), and a Book a Session CTA. Render server-side for SEO. Add Open Graph meta tags using the trainer's name and bio."},{"chunk_id":3,"prompt":"Build session type creation and availability management. Create session_types: id, trainer_id, name, description, duration_minutes, price_cents, is_active, created_at. RLS: trainers manage their own session types only.\n\nCreate availability_slots: id, trainer_id, day_of_week (0=Monday to 6=Sunday), start_time, end_time, is_active. RLS: trainers manage their own slots.\n\nIn the trainer dashboard, add two sections. Session Types: list with Edit/Deactivate controls and an Add Session Type button that opens a form with name, description, duration (30/45/60/90 min dropdown), and price. Availability: a 7-column weekly grid where each column has toggle-able time blocks (6am–8am, 8am–10am, etc.). Toggling saves or removes the slot in Supabase. Both session types and availability slots must appear on the public trainer profile."},{"chunk_id":4,"prompt":"Build the client-facing trainer discovery experience. The /trainers page fetches all trainers who have completed onboarding (at least one session type and one availability slot) and shows them as a responsive card grid.\n\nEach card shows: profile photo, full name, city, top 2 speciality badges, star rating (or 'New' if no reviews), starting price, and days available this week.\n\nAdd a search and filter bar: city text search, speciality multi-select dropdown, and a price range slider. Filters update the list without a page reload using URL search params so results are shareable.\n\nThe landing page city search navigates to /trainers?city=X with the search pre-applied. Use server-side rendering with Suspense and skeleton cards as fallback."},{"chunk_id":5,"prompt":"Build the session booking flow on the trainer's public profile. Below the trainer's bio and session types, add a booking widget. Step 1: client selects a session type. Step 2: a date picker shows only days the trainer has marked as available. Step 3: available time slots for the selected date appear, excluding already-booked times. Step 4: a confirmation screen shows session details and a Confirm Booking button.\n\nOn confirm, create a booking row: session_type_id, trainer_id, client_id, scheduled_at, duration_minutes, price_cents, status ('pending'), created_at. Redirect to /dashboard/client after booking.\n\nIn /dashboard/trainer, show upcoming bookings with client name, session type, date/time, and a Mark Complete button. In /dashboard/client, show upcoming bookings with trainer name, session type, date/time, and a Cancel button."},{"chunk_id":6,"prompt":"Implement Stripe Connect for trainer payouts and payment at booking. Build Stripe Connect onboarding in /dashboard/trainer: show a Connect Stripe Account banner if stripe_onboarded is false. Clicking creates a Stripe Connect account and returns an onboarding URL. Handle the return redirect, verify the account is active, then update stripe_account_id and stripe_onboarded.\n\nAdd payment to the booking flow. After the client confirms, create a Stripe PaymentIntent with application_fee_amount set to 10% of the session price. Return the client secret and show Stripe's payment element inline. On payment success, update booking status to 'confirmed'.\n\nCreate a webhook at /api/webhooks/stripe handling: payment_intent.succeeded (confirm booking) and payment_intent.payment_failed (cancel booking). When a trainer marks a session complete, trigger a Stripe transfer of 90% to their connected account."},{"chunk_id":7,"prompt":"Build emails, cancellation flow, and the review system using Resend. Send emails for: booking confirmed (to trainer and client with session type, date, time, location), booking cancelled (to both parties with refund status), session complete + review request (to client 1 hour after session end).\n\nCancellation: if more than 24 hours before the session, issue a full Stripe refund and update status to 'cancelled'. If under 24 hours, no refund — show a clear warning before confirming. Trainers always trigger a full refund regardless of timing.\n\nReview system: create the reviews table. After clicking the review link in the email, client lands on /review/[bookingId] with a star rating and optional comment form. On submit, save the review. Update the trainer's average rating on their public profile and in search results."}],"launch_checklist":{"categories":[{"name":"Environment","mandatory":true,"items":[{"task":"All environment variables configured in Vercel production","explanation":"Missing variables will crash bookings, payments, or emails silently. Verify each one is present and correct."},{"task":"STRIPE_CONNECT_CLIENT_ID set for production (not test) Stripe account","explanation":"Connect onboarding uses this ID to link trainer accounts to your platform. Test and live IDs are different."},{"task":"Supabase Storage bucket 'avatars' set to public read","explanation":"Trainer profile photos must be publicly accessible for profile pages to render correctly."}]},{"name":"Database","mandatory":false,"items":[{"task":"RLS verified on bookings, reviews, and profiles tables","explanation":"Clients must only see their own bookings. Trainers must only see bookings assigned to them. Misconfigured RLS is a serious data leak."},{"task":"Availability slot timezone handling confirmed correct","explanation":"A trainer setting 9am slots must mean 9am in their local time. Verify timezones are stored and displayed correctly."}]},{"name":"Auth","mandatory":true,"items":[{"task":"Supabase Auth redirect URLs updated to production domain","explanation":"Email confirmation links point to localhost if this isn't updated — new users can't verify their accounts."},{"task":"Role assignment tested — trainers cannot access client dashboard and vice versa","explanation":"Test both roles in production. A bug here means trainers could see client booking data or vice versa."}]},{"name":"Payments","mandatory":true,"items":[{"task":"Stripe Connect live mode configured and tested end-to-end","explanation":"Complete the full trainer onboarding → client booking → payment → trainer payout flow with real amounts before launch."},{"task":"Platform fee percentage confirmed in code and Stripe dashboard","explanation":"The application_fee_amount in your PaymentIntent must match what you've communicated to trainers."},{"task":"Stripe webhook registered for production URL with correct events","explanation":"Subscribe to: payment_intent.succeeded, payment_intent.payment_failed, and account.updated."}]},{"name":"Security","mandatory":true,"items":[{"task":"Stripe webhook signature verification implemented","explanation":"Without this, anyone can POST to your webhook endpoint and fake payment confirmations. Verify the Stripe-Signature header on every request."},{"task":"Trainers cannot access other trainers' earnings or booking data","explanation":"Test by creating two trainer accounts and trying to access each other's dashboard data directly via API."},{"task":"Public profile pages do not expose trainer's email or phone number","explanation":"The /trainers/[slug] page must not return contact details — clients book through the platform, not directly."}]},{"name":"Launch","mandatory":false,"items":[{"task":"Full booking flow tested: discovery → profile → book → pay → confirm → complete → review","explanation":"Walk the entire user journey as a client with a real trainer account on production before opening to the public."},{"task":"Mobile booking flow tested on iOS and Android","explanation":"Most clients will book on their phone. The time slot picker and Stripe payment form must work perfectly on mobile."},{"task":"Cancellation and refund flow tested for both timing scenarios","explanation":"Test a cancellation 25+ hours before and one under 24 hours. Confirm refunds appear in Stripe and emails sent correctly."}]}]}}};
+
+// ── STATE ──
+let ideaKey = 'invoice';
+let phase = 'ideation';
+let unlocked = ['ideation'];
+let dec = {};
+let clState = {};
+let techView = false;
+let animating = false;
+
+const PHASES = [
+  {id:'ideation',label:'Ideation'},
+  {id:'features',label:'Feature Scoping'},
+  {id:'agent',label:'Agent Selection'},
+  {id:'stack',label:'Stack & Architecture'},
+  {id:'chunks',label:'Build Chunking'},
+  {id:'prompts',label:'Prompt Generation'},
+  {id:'launch',label:'Launch Checklist'},
+];
+
+const AGENTS = [
+  {id:'cursor',name:'Cursor',type:'step',desc:'File-aware editor. Focused chunks, great for iterating and course-correcting as you go.'},
+  {id:'claude_code',name:'Claude Code',type:'step',desc:'Terminal-based agentic AI. Handles larger multi-file tasks autonomously.'},
+  {id:'windsurf',name:'Windsurf',type:'step',desc:'Editor-based agent with deep codebase context. Works well with medium-sized chunks.'},
+  {id:'bolt',name:'Bolt',type:'shot',desc:'Browser-based full-stack generator. Great for generating whole app slices in one prompt.'},
+  {id:'lovable',name:'Lovable',type:'shot',desc:'Chat-driven app generator. Describe your product and it builds the structure and hosting.'},
+  {id:'v0',name:'v0',type:'shot',desc:'UI-first generator from Vercel. Excellent for React components and frontend-heavy apps.'},
+];
+
+// ── HELPERS ──
+const $=id=>document.getElementById(id);
+const d=()=>DATA[ideaKey];
+
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+async function typeText(el, text, speed=18){
+  el.textContent='';
+  el.classList.add('typing');
+  for(let i=0;i<text.length;i++){
+    el.textContent+=text[i];
+    await delay(speed+Math.random()*10);
+  }
+  el.classList.remove('typing');
+}
+
+async function fadeIn(el,ms=200){
+  el.style.opacity='0';
+  el.style.display='';
+  await delay(10);
+  el.style.transition=`opacity ${ms}ms`;
+  el.style.opacity='1';
+  await delay(ms);
+}
+
+// ── NAV ──
+function renderNav(){
+  $('phase-nav').innerHTML=PHASES.map((p,i)=>{
+    const pidx=PHASES.findIndex(x=>x.id===phase);
+    const idx=i;
+    const isActive=p.id===phase;
+    const isDone=unlocked.includes(p.id)&&idx<pidx;
+    const isLocked=!unlocked.includes(p.id);
+    return `<div class="pni ${isActive?'active':''} ${isDone?'done':''} ${isLocked?'locked':''}" onclick="goPhase('${p.id}')">
+      <div class="pni-dot">${isDone?'✓':i+1}</div>
+      <div class="pni-label">${p.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDec(){
+  const data=d();
+  const agent=dec.agent||null;
+  const agentNames={cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'};
+  const items=[
+    {k:'Product',v:{invoice:'Invoice Tracker',apicost:'API Cost Monitor',fitness:'Fitness Marketplace'}[ideaKey],always:true},
+    {k:'Agent',v:agent?agentNames[agent]:null},
+    {k:'Frontend',v:dec.stack?data.stack.layers[0].choice:null},
+    {k:'Database',v:dec.stack?data.stack.layers[2].choice:null},
+    {k:'Payments',v:dec.stack?data.stack.layers[5].choice:null},
+    {k:'Chunks',v:dec.chunks?`${data.chunks.length} total`:null},
+  ];
+  $('decisions').innerHTML=items.map(i=>`<div class="dec-item">
+    <div class="dec-key">${i.k}</div>
+    <div class="dec-val ${i.v?'set':'empty'}">${i.v||'—'}</div>
+  </div>`).join('');
+}
+
+function goPhase(id){
+  if(!unlocked.includes(id)||animating)return;
+  phase=id;
+  renderNav();
+  renderPhase(id);
+  $('main').scrollTop=0;
+}
+
+function advance(to){
+  if(!unlocked.includes(to))unlocked.push(to);
+  phase=to;
+  renderNav();
+  renderDec();
+  renderPhase(to);
+  $('main').scrollTop=0;
+}
+
+// ── MAIN RENDER ──
+function renderPhase(id){
+  const main=$('main');
+  main.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.className='panel active';
+  if(id==='ideation')wrap.innerHTML=buildIdeation();
+  else if(id==='features')wrap.innerHTML=buildFeatures();
+  else if(id==='agent')wrap.innerHTML=buildAgent();
+  else if(id==='stack')wrap.innerHTML=buildStack();
+  else if(id==='chunks')wrap.innerHTML=buildChunks();
+  else if(id==='prompts')wrap.innerHTML=buildPrompts();
+  else if(id==='launch')wrap.innerHTML=buildLaunch();
+  main.appendChild(wrap);
+
+  if(id==='ideation')runIdeationTutorial();
+  if(id==='features')runFeaturesTutorial();
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 1 — IDEATION
+// ══════════════════════════════════════════════════
+function buildIdeation(){
+  return `
+  ${narrationCard('ideation')}
+  <div class="phase-eyebrow">Phase 01 · Ideation</div>
+  <div class="phase-title">What's your idea? ${qBtn('ideation')}</div>
+  <div class="phase-desc">Start with your raw idea — as vague as you like. We'll help you turn it into a clear product foundation.</div>
+
+  <div class="card">
+    <div class="card-hd">Your idea</div>
+    <textarea class="ti" id="idea-ta" rows="3" placeholder="Describe your idea in plain English..." style="margin-bottom:.625rem"></textarea>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-primary" id="idea-btn" onclick="submitIdea()" disabled>Analyse my idea →</button>
+    </div>
+  </div>
+
+  <div id="qa-section" class="hidden">
+    <div class="card">
+      <div class="card-hd">
+        <span class="inline-spinner" id="qa-spinner"></span>
+        <span id="qa-hd-txt">Generating questions...</span>
+      </div>
+      <div id="qa-items"></div>
+      <div id="qa-cta" class="hidden">
+        <div class="divider"></div>
+        <button class="btn btn-primary" onclick="goToKernel()">Generate product kernel →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kernel-section" class="hidden">
+    <div class="card">
+      <div class="card-hd">
+        <span class="inline-spinner" id="kernel-spinner"></span>
+        <span id="kernel-hd-txt">Synthesising your product kernel...</span>
+      </div>
+      <div id="kernel-rows"></div>
+    </div>
+  </div>
+
+  <div id="analysis-section" class="hidden">
+    <div class="card">
+      <div class="card-hd">
+        <span class="inline-spinner" id="ana-spinner"></span>
+        <span id="ana-hd-txt">Analysing your idea...</span>
+      </div>
+      <div id="ana-items"></div>
+    </div>
+  </div>
+
+  <div id="ideation-cta" class="hidden btn-row">
+    <button class="btn btn-primary" onclick="advance('features')">Lock ideation & continue →</button>
+  </div>`;
+}
+
+async function runIdeationTutorial(){
+  const ta=$('idea-ta');
+  const btn=$('idea-btn');
+  const raw=d().raw;
+  animating=true;
+  await delay(500);
+  // type the idea
+  btn.disabled=true;
+  ta.value='';
+  for(let i=0;i<raw.length;i++){
+    ta.value+=raw[i];
+    if(ta.value.length>3)btn.disabled=false;
+    await delay(22+Math.random()*12);
+  }
+  await delay(600);
+  btn.disabled=false;
+  animating=false;
+}
+
+async function submitIdea(){
+  if(animating)return;
+  animating=true;
+  const qs=$('qa-section');
+  qs.classList.remove('hidden');
+  await delay(300);
+
+  const spinner=$('qa-spinner');
+  const hdTxt=$('qa-hd-txt');
+  const items=$('qa-items');
+  const cta=$('qa-cta');
+
+  const questions=d().ideation.questions;
+  const answers=d().ideation.answers;
+
+  await delay(1200);
+  spinner.style.display='none';
+  hdTxt.textContent='Clarifying questions';
+
+  for(let i=0;i<questions.length;i++){
+    await delay(300);
+    const item=document.createElement('div');
+    item.className='qa-item';
+    item.innerHTML=`<div class="qa-q">
+      <div class="qa-qnum">${i+1}</div>
+      <div class="qa-qtext">${questions[i]}</div>
+    </div>
+    <div class="qa-ans" id="ans-${i}" contenteditable="true"></div>`;
+    items.appendChild(item);
+    await delay(200);
+    const ansEl=$(`ans-${i}`);
+    await typeText(ansEl,answers[i],14);
+    await delay(200);
+  }
+  await delay(300);
+  cta.classList.remove('hidden');
+  animating=false;
+}
+
+async function goToKernel(){
+  if(animating)return;
+  animating=true;
+  const ks=$('kernel-section');
+  ks.classList.remove('hidden');
+  await delay(400);
+
+  const spinner=$('kernel-spinner');
+  const hdTxt=$('kernel-hd-txt');
+  const rows=$('kernel-rows');
+
+  await delay(1000);
+  spinner.style.display='none';
+  hdTxt.textContent='Product kernel';
+
+  const kernel=d().ideation.kernel;
+  const labels={problem:'Problem',solution:'Solution',target_user:'Target user',value_prop:'Value prop',out_of_scope:'Out of scope',success_metric:'Success metric'};
+
+  for(const [k,v] of Object.entries(kernel)){
+    await delay(180);
+    const row=document.createElement('div');
+    row.className='kernel-row';
+    row.innerHTML=`<div class="kr-key">${labels[k]||k}</div><div class="kr-val" id="kr-${k}" contenteditable="true"></div>`;
+    rows.appendChild(row);
+    await delay(80);
+    const el=$(`kr-${k}`);
+    el.classList.add('typing');
+    await typeText(el,v,10);
+    el.classList.remove('typing');
+  }
+
+  await delay(400);
+  await runAnalysis();
+}
+
+async function runAnalysis(){
+  const as=$('analysis-section');
+  as.classList.remove('hidden');
+  await delay(400);
+
+  const spinner=$('ana-spinner');
+  const hdTxt=$('ana-hd-txt');
+  const items=$('ana-items');
+
+  await delay(900);
+  spinner.style.display='none';
+  hdTxt.textContent='Idea analysis';
+
+  const analysis=d().ideation.analysis;
+  for(const a of analysis){
+    await delay(250);
+    const el=document.createElement('div');
+    el.className=`ana-item ana-${a.type}`;
+    el.innerHTML=`<div class="ana-icon">${a.type==='strong'?'✓':a.type==='weak'?'!':'⚠'}</div>
+    <div class="ana-body"><strong>${a.title}</strong><span>${a.detail}</span></div>`;
+    items.appendChild(el);
+  }
+
+  await delay(400);
+  $('ideation-cta').classList.remove('hidden');
+  animating=false;
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 2 — FEATURES
+// ══════════════════════════════════════════════════
+function buildFeatures(){
+  return `
+  ${narrationCard('features')}
+  <div class="phase-eyebrow">Phase 02 · Feature Scoping</div>
+  <div class="phase-title">Your MVP feature list ${qBtn('features')}</div>
+  <div class="phase-desc">Industry-standard features suggested for your product type, organised by priority. Move features between tiers or remove them.</div>
+
+  <div class="card" id="feat-core-card" style="opacity:0">
+    <div class="bucket-tag bt-core">Core — must ship <div class="bt-sep"></div> <span style="color:var(--text4);font-size:10px">product doesn't work without these</span></div>
+    <div id="feat-core"></div>
+  </div>
+
+  <div class="card" id="feat-should-card" style="opacity:0">
+    <div class="bucket-tag bt-should">Should have <div class="bt-sep"></div> <span style="color:var(--text4);font-size:10px">meaningfully improves the experience</span></div>
+    <div id="feat-should"></div>
+  </div>
+
+  <div class="card" id="feat-nice-card" style="opacity:0">
+    <div class="bucket-tag bt-nice">Nice to have <div class="bt-sep"></div> <span style="color:var(--text4);font-size:10px">good ideas, post-MVP</span></div>
+    <div id="feat-nice"></div>
+  </div>
+
+  <div class="card" id="flags-card" style="opacity:0">
+    <div class="card-hd">⚠ Scope flags <div class="card-hd-badge" style="background:var(--yellow2);color:#c0a030">Review before building</div></div>
+    <div id="flags-list"></div>
+  </div>
+
+  <div class="card" id="road-card" style="opacity:0">
+    <div class="card-hd" style="color:var(--green)">Your roadmap starts here</div>
+    <div id="road-list"></div>
+  </div>
+
+  <div id="feat-cta" class="hidden btn-row">
+    <button class="btn btn-primary" onclick="advance('agent')">Lock features & continue →</button>
+    <button class="btn btn-ghost" onclick="goPhase('ideation')">← Back</button>
+  </div>`;
+}
+
+async function runFeaturesTutorial(){
+  animating=true;
+  const f=d().features;
+
+  async function showFeatures(containerId, items){
+    const el=$(containerId);
+    for(const fi of items){
+      await delay(120);
+      const div=document.createElement('div');
+      div.className='fi';
+      div.innerHTML=`<span class="fi-cx cx-${fi.complexity}">${fi.complexity}</span>
+      <div><div class="fi-name">${fi.name}</div><div class="fi-desc">${fi.description} — <em style="color:var(--text4)">${fi.why}</em></div></div>`;
+      el.appendChild(div);
+    }
+  }
+
+  await delay(300);
+  const coreCard=$('feat-core-card');
+  coreCard.style.transition='opacity .3s';coreCard.style.opacity='1';
+  await showFeatures('feat-core',f.core);
+
+  await delay(300);
+  const shouldCard=$('feat-should-card');
+  shouldCard.style.transition='opacity .3s';shouldCard.style.opacity='1';
+  await showFeatures('feat-should',f.should_have);
+
+  await delay(200);
+  const niceCard=$('feat-nice-card');
+  niceCard.style.transition='opacity .3s';niceCard.style.opacity='1';
+  await showFeatures('feat-nice',f.nice_to_have);
+
+  await delay(300);
+  if(f.pressure_flags.length){
+    const flagsCard=$('flags-card');
+    flagsCard.style.transition='opacity .3s';flagsCard.style.opacity='1';
+    for(const fl of f.pressure_flags){
+      await delay(150);
+      const div=document.createElement('div');
+      div.className=`flag-block flag-${fl.severity}`;
+      div.innerHTML=`<div class="flag-icon">${fl.severity==='warning'?'⚠':'ℹ'}</div>
+      <div class="flag-txt"><strong>${fl.feature}:</strong> ${fl.flag}</div>`;
+      $('flags-list').appendChild(div);
+    }
+  }
+
+  await delay(300);
+  const roadCard=$('road-card');
+  roadCard.style.transition='opacity .3s';roadCard.style.opacity='1';
+  const byVer={};
+  f.roadmap.forEach(r=>{if(!byVer[r.version])byVer[r.version]=[];byVer[r.version].push(r);});
+  for(const[ver,items] of Object.entries(byVer)){
+    const hdr=document.createElement('div');
+    hdr.className='road-ver';
+    hdr.innerHTML=`${ver}<div class="road-ver-sep"></div>`;
+    $('road-list').appendChild(hdr);
+    for(const r of items){
+      await delay(100);
+      const div=document.createElement('div');
+      div.className='road-item';
+      div.innerHTML=`<span><span class="ri-n">${r.name}</span><span class="ri-w">— ${r.why_parked}</span></span>`;
+      $('road-list').appendChild(div);
+    }
+  }
+
+  await delay(300);
+  $('feat-cta').classList.remove('hidden');
+  animating=false;
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 3 — AGENT
+// ══════════════════════════════════════════════════
+function buildAgent(){
+  const rec=d().agent.recommended;
+  const sel=dec.agent||rec;
+  const meanings={
+    cursor:'Because you chose Cursor, your build will be broken into focused, file-aware chunks — one feature at a time. Each prompt references specific files and folders, giving you full control to course-correct at every step.',
+    claude_code:'Because you chose Claude Code, your build will use larger, more autonomous chunks. Claude Code handles multi-file tasks end to end — each chunk is a feature brief. Fewer sessions, more accomplished per session.',
+    windsurf:'Because you chose Windsurf, your build uses medium-sized chunks with deep codebase context. Similar to Cursor but handles slightly larger scopes per session.',
+    bolt:'Because you chose Bolt, your prompts will be spec-style — larger, complete descriptions. The first prompt is your full app scaffold. Subsequent prompts add features one at a time.',
+    lovable:'Because you chose Lovable, your prompts read like product briefs. Lovable generates structure, UI, and hosting together — your first prompt does the heavy lifting.',
+    v0:'Because you chose v0, your prompts are UI-focused component specifications. v0 excels at React UI generation — pair it with a separate backend agent for full-stack builds.'
+  };
+  const cards=AGENTS.map(a=>`
+    <div class="ag-card ${a.id===sel?'selected':''} ${a.id===rec?'':''}` + (a.id===rec?' style="position:relative"':'') + `" id="ag-${a.id}" onclick="pickAgent('${a.id}')">
+      ${a.id===rec?'<div class="ag-rec">Recommended</div>':''}
+      <div class="ag-name">${a.name}</div>
+      <div class="ag-type ${a.type==='step'?'step':'shot'}">${a.type==='step'?'Step-by-step':'One-shot'}</div>
+      <div class="ag-desc">${a.desc}</div>
+    </div>`).join('');
+
+  return `
+  ${narrationCard('agent')}
+  <div class="phase-eyebrow">Phase 03 · Agent Selection</div>
+  <div class="phase-title">Choose your coding agent ${qBtn('agent')}</div>
+  <div class="phase-desc">This changes how your build is chunked and how each prompt is formatted. We recommend <strong style="color:var(--amber2)">${{cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'}[rec]}</strong> for this product.</div>
+
+  <div class="card">
+    <div class="agent-grid">${cards}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">What this means for your build</div>
+    <div class="meaning-box" id="meaning-box">${meanings[sel]||meanings[rec]}</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="lockAgent()">Lock agent & continue →</button>
+    <button class="btn btn-ghost" onclick="goPhase('features')">← Back</button>
+  </div>`;
+}
+
+function pickAgent(id){
+  dec.agent=id;
+  const meanings={
+    cursor:'Because you chose Cursor, your build will be broken into focused, file-aware chunks — one feature at a time. Each prompt references specific files and folders, giving you full control to course-correct at every step.',
+    claude_code:'Because you chose Claude Code, your build will use larger, more autonomous chunks. Claude Code handles multi-file tasks end to end — each chunk is a feature brief. Fewer sessions, more accomplished per session.',
+    windsurf:'Because you chose Windsurf, your build uses medium-sized chunks with deep codebase context. Similar to Cursor but handles slightly larger scopes per session.',
+    bolt:'Because you chose Bolt, your prompts will be spec-style — larger, complete descriptions. The first prompt is your full app scaffold. Subsequent prompts add features one at a time.',
+    lovable:'Because you chose Lovable, your prompts read like product briefs. Lovable generates structure, UI, and hosting together — your first prompt does the heavy lifting.',
+    v0:'Because you chose v0, your prompts are UI-focused component specifications. v0 excels at React UI generation — pair it with a separate backend agent for full-stack builds.'
+  };
+  document.querySelectorAll('.ag-card').forEach(c=>c.classList.remove('selected'));
+  $('ag-'+id).classList.add('selected');
+  $('meaning-box').textContent=meanings[id];
+}
+
+function lockAgent(){
+  if(!dec.agent)dec.agent=d().agent.recommended;
+  dec.agentLocked=true;
+  advance('stack');
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 4 — STACK
+// ══════════════════════════════════════════════════
+function buildStack(){
+  const s=d().stack;
+  const rows=s.layers.map(l=>`
+    <div class="stack-row">
+      <div class="sr-layer">${l.layer}</div>
+      <div class="sr-choice">${l.choice}</div>
+      <div class="sr-reason" id="sr-${l.layer.replace(/\s+/g,'')}">
+        <div class="sr-plain">${l.plain_english}</div>
+        <div class="sr-tech" style="display:none;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text4)">${l.reason}</div>
+      </div>
+    </div>`).join('');
+
+  const pages=s.architecture.pages.map(p=>`<div class="arch-page">${p}</div>`).join('');
+  const dm=s.architecture.data_model.map(t=>`
+    <div class="dm-row">
+      <div class="dm-tbl">${t.table}</div>
+      <div class="dm-flds">${t.fields.join(', ')}</div>
+      <div class="dm-rel">${t.relates_to}</div>
+    </div>`).join('');
+  const svcs=s.architecture.external_services.map(sv=>`<div class="ext-svc">${sv}</div>`).join('');
+
+  return `
+  ${narrationCard('stack')}
+  <div class="phase-eyebrow">Phase 04 · Stack & Architecture</div>
+  <div class="phase-title">Your technical foundation ${qBtn('stack')}</div>
+  <div class="phase-desc">Recommended stack based on your product type, features, and agent choice. Every decision is explained in plain English — toggle to see the technical rationale.</div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+      <div class="card-hd" style="margin:0">Stack recommendation</div>
+      <button class="view-toggle" onclick="toggleTech()">Technical rationale</button>
+    </div>
+    ${rows}
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hd">Pages & routes</div>
+      ${pages}
+    </div>
+    <div class="card">
+      <div class="card-hd">External services</div>
+      ${svcs}
+      <div class="divider"></div>
+      <div class="card-hd" style="margin-bottom:.5rem">Auth flow</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.55">${s.architecture.auth_flow}</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">Data model</div>
+    <div style="display:grid;grid-template-columns:110px 1fr 130px;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.06em">Table</div>
+      <div style="font-size:10px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.06em">Fields</div>
+      <div style="font-size:10px;font-weight:500;color:var(--text4);text-transform:uppercase;letter-spacing:.06em">Relates to</div>
+    </div>
+    ${dm}
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="lockStack()">Lock stack & continue →</button>
+    <button class="btn btn-ghost" onclick="goPhase('agent')">← Back</button>
+  </div>`;
+}
+
+function toggleTech(){
+  techView=!techView;
+  d().stack.layers.forEach(l=>{
+    const key=l.layer.replace(/\s+/g,'');
+    const el=$('sr-'+key);
+    if(!el)return;
+    el.querySelector('.sr-plain').style.display=techView?'none':'';
+    el.querySelector('.sr-tech').style.display=techView?'':'none';
+  });
+}
+
+function lockStack(){
+  dec.stack=true;
+  advance('chunks');
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 5 — CHUNKS
+// ══════════════════════════════════════════════════
+function buildChunks(){
+  const chunks=d().chunks;
+  const list=chunks.map(c=>`
+    <div class="chunk-card" id="ch-${c.id}" onclick="toggleChunk(${c.id})">
+      <div class="chunk-hdr">
+        <div class="chunk-num">${c.id}</div>
+        <div class="chunk-ttl">${c.title}</div>
+        <span class="chunk-cx cx-${c.complexity}">${c.complexity}</span>
+      </div>
+      <div class="chunk-body">
+        <div class="chunk-delivers">${c.delivers}</div>
+        <div class="chunk-deps">${c.depends_on.length?'Depends on: Chunks '+c.depends_on.join(', '):'No dependencies — can start immediately'}</div>
+        <div class="chunk-cl">
+          ${c.done_when.map(dw=>`<div class="cl-item">${dw}</div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+
+  return `
+  ${narrationCard('chunks')}
+  <div class="phase-eyebrow">Phase 05 · Build Chunking</div>
+  <div class="phase-title">Your ordered build plan ${qBtn('chunks')}</div>
+  <div class="phase-desc">${chunks.length} ordered, dependency-aware chunks. Each chunk is one agent session. Click any to see what it delivers and how to verify it's done.</div>
+
+  <div class="card">
+    <div class="card-hd" style="margin-bottom:.625rem">Session granularity</div>
+    <div class="gran-wrap">
+      <input type="range" min="1" max="3" value="2" oninput="updateGran(this.value)">
+      <div class="gran-lbl"><span>Fewer, bigger</span><span id="gran-val">Balanced</span><span>More, smaller</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:.875rem 1.1rem">
+    <div class="card-hd" style="margin-bottom:.875rem">${chunks.length} build chunks</div>
+    ${list}
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="lockChunks()">Lock build plan & continue →</button>
+    <button class="btn btn-ghost" onclick="goPhase('stack')">← Back</button>
+  </div>`;
+}
+
+function toggleChunk(id){
+  $('ch-'+id).classList.toggle('open');
+}
+function updateGran(v){
+  $('gran-val').textContent={1:'Fewer, bigger',2:'Balanced',3:'More, smaller'}[v];
+}
+function lockChunks(){
+  dec.chunks=true;
+  advance('prompts');
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 6 — PROMPTS
+// ══════════════════════════════════════════════════
+function buildPrompts(){
+  const prompts=d().prompts;
+  const chunks=d().chunks;
+  const agentNames={cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'};
+  const agentName=agentNames[dec.agent||d().agent.recommended];
+
+  const blocks=prompts.map(p=>{
+    const chunk=chunks.find(c=>c.id===p.chunk_id);
+    return `<div class="prompt-block" id="pb-${p.chunk_id}">
+      <div class="prompt-hdr" onclick="togglePrompt(${p.chunk_id})">
+        <div class="prompt-cnum">${p.chunk_id}</div>
+        <div class="prompt-ttl">${chunk?chunk.title:'Chunk '+p.chunk_id}</div>
+        <button class="copy-btn" id="cpbtn-${p.chunk_id}" onclick="event.stopPropagation();copyPrompt(${p.chunk_id})">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <div class="prompt-txt" id="pt-${p.chunk_id}">${p.prompt}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  ${narrationCard('prompts')}
+  <div class="phase-eyebrow">Phase 06 · Prompt Generation</div>
+  <div class="phase-title">Your agent-ready prompts ${qBtn('prompts')}</div>
+  <div class="phase-desc">One prompt per chunk, formatted for <strong style="color:var(--amber2)">${agentName}</strong>. Expand to preview, copy to paste directly into your agent.</div>
+
+  <div class="prompt-tip">
+    <div class="prompt-tip-icon">💡</div>
+    <div class="prompt-tip-body"><strong>How to use these:</strong> Start with Chunk 01. Copy the prompt, paste into ${agentName}, and build until every done-when item is complete. Return here for Chunk 02. Never skip ahead — each chunk builds on the last.</div>
+  </div>
+
+  ${blocks}
+
+  <div class="btn-row" style="margin-top:1.25rem">
+    <button class="btn btn-primary" onclick="advance('launch')">Ready — go to launch checklist →</button>
+    <button class="btn btn-ghost" onclick="goPhase('chunks')">← Back</button>
+  </div>`;
+}
+
+function togglePrompt(id){$('pb-'+id).classList.toggle('open')}
+function copyPrompt(id){
+  const txt=$('pt-'+id).textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=$('cpbtn-'+id);
+    btn.textContent='Copied!';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},2000);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// PHASE 7 — LAUNCH
+// ══════════════════════════════════════════════════
+function buildLaunch(){
+  const lc=d().launch_checklist;
+  if(!clState[ideaKey])clState[ideaKey]={};
+  const state=clState[ideaKey];
+
+  let total=0,checked=0;
+  lc.categories.forEach(cat=>cat.items.forEach((_,i)=>{
+    const k=`${cat.name}-${i}`;total++;
+    if(state[k])checked++;
+  }));
+  const pct=total?Math.round((checked/total)*100):0;
+
+  const cats=lc.categories.map(cat=>`
+    <div class="lc-cat">
+      <div class="lc-hdr">
+        <div class="lc-name">${cat.name}</div>
+        ${cat.mandatory?`<span class="lc-badge-req">Required</span>`:`<span class="lc-badge-opt">Recommended</span>`}
+      </div>
+      <div class="lc-items">
+        ${cat.items.map((item,i)=>{
+          const k=`${cat.name}-${i}`;
+          const on=state[k]||false;
+          return `<div class="lc-item">
+            <div class="lc-cb ${on?'on':''}" id="lcb-${k}" onclick="toggleCL('${k}')"></div>
+            <div>
+              <div class="lc-task ${on?'done':''}" id="lct-${k}" onclick="toggleCL('${k}')">${item.task}</div>
+              <div class="lc-explain">${item.explanation}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+
+  const roadmap=d().features.roadmap.map(r=>`
+    <div class="rm-item">
+      <span class="rm-ver">${r.version}</span>
+      <span class="rm-name">${r.name}</span>
+      <span class="rm-why">— ${r.why_parked}</span>
+    </div>`).join('');
+
+  return `
+  ${narrationCard('launch')}
+  <div class="phase-eyebrow">Phase 07 · Launch Checklist</div>
+  <div class="phase-title">Ship it ${qBtn('launch')}</div>
+  <div class="phase-desc">Everything to check before going live. Required items must be complete — the rest is strongly recommended.</div>
+
+  <div class="progress-ring-wrap">
+    <div>
+      <div class="pct-label">${pct}%</div>
+      <div class="pct-sub">${checked} of ${total} complete</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:${pct}%"></div></div>
+  </div>
+
+  ${cats}
+
+  <div class="roadmap-card" style="margin-top:.875rem">
+    <div class="roadmap-title">Your v2 roadmap</div>
+    ${roadmap}
+  </div>
+
+  <div class="btn-row" style="margin-top:1.25rem">
+    <button class="btn btn-primary" onclick="exportMD()">Export build plan (.md) ↓</button>
+    <button class="btn btn-ghost" onclick="goPhase('prompts')">← Back to prompts</button>
+  </div>`;
+}
+
+function toggleCL(k){
+  if(!clState[ideaKey])clState[ideaKey]={};
+  clState[ideaKey][k]=!clState[ideaKey][k];
+  const on=clState[ideaKey][k];
+  $('lcb-'+k).classList.toggle('on',on);
+  $('lct-'+k).classList.toggle('done',on);
+  // update progress
+  const lc=d().launch_checklist;
+  let total=0,checked=0;
+  lc.categories.forEach(cat=>cat.items.forEach((_,i)=>{
+    const key=`${cat.name}-${i}`;total++;
+    if(clState[ideaKey][key])checked++;
+  }));
+  const pct=Math.round((checked/total)*100);
+  const fill=$('prog-fill');
+  if(fill){fill.style.width=pct+'%';}
+  const lbl=document.querySelector('.pct-label');if(lbl)lbl.textContent=pct+'%';
+  const sub=document.querySelector('.pct-sub');if(sub)sub.textContent=`${checked} of ${total} complete`;
+}
+
+// ══════════════════════════════════════════════════
+// MD EXPORT
+// ══════════════════════════════════════════════════
+function exportMD(){
+  const data=d();
+  const names={invoice:'Invoice Tracker',apicost:'API Cost Monitor',fitness:'Fitness Marketplace'};
+  const agentKey=dec.agent||data.agent.recommended;
+  const agentNames={cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'};
+  const now=new Date().toISOString();
+
+  let md=`---
+vibe-version: 1.0
+created: ${now}
+product: ${names[ideaKey]}
+stage: launch-checklist
+agent: ${agentKey}
+stack: ${data.stack.layers[0].choice} + ${data.stack.layers[2].choice}
+chunks-total: ${data.chunks.length}
+---
+
+# ${names[ideaKey]} — Vibestudio Build Plan
+
+## Raw Idea
+
+> ${data.raw}
+
+## Product Kernel
+
+| Field | Detail |
+|-------|--------|
+| Problem | ${data.ideation.kernel.problem} |
+| Solution | ${data.ideation.kernel.solution} |
+| Target User | ${data.ideation.kernel.target_user} |
+| Value Prop | ${data.ideation.kernel.value_prop} |
+| Out of Scope | ${data.ideation.kernel.out_of_scope} |
+| Success Metric | ${data.ideation.kernel.success_metric} |
+
+## MVP Features
+
+### Core (must ship)
+${data.features.core.map(f=>`- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+### Should Have
+${data.features.should_have.map(f=>`- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+### Nice to Have
+${data.features.nice_to_have.map(f=>`- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+## Roadmap
+
+${data.features.roadmap.map(r=>`- **${r.version}** — ${r.name}: ${r.why_parked}`).join('\n')}
+
+## Stack
+
+| Layer | Choice | Reasoning |
+|-------|--------|-----------|
+${data.stack.layers.map(l=>`| ${l.layer} | ${l.choice} | ${l.reason} |`).join('\n')}
+
+## Architecture
+
+### Pages
+${data.stack.architecture.pages.map(p=>`- \`${p}\``).join('\n')}
+
+### Data Model
+${data.stack.architecture.data_model.map(t=>`- **${t.table}**: ${t.fields.join(', ')} — *${t.relates_to}*`).join('\n')}
+
+### Auth Flow
+${data.stack.architecture.auth_flow}
+
+### External Services
+${data.stack.architecture.external_services.map(s=>`- ${s}`).join('\n')}
+
+## Build Plan
+
+${data.chunks.map(c=>{
+  const prompt=data.prompts.find(p=>p.chunk_id===c.id);
+  return `---
+
+## Chunk ${String(c.id).padStart(2,'0')} — ${c.title}
+
+**Feature:** ${c.feature}
+**Complexity:** ${c.complexity}
+**Depends on:** ${c.depends_on.length?'Chunks '+c.depends_on.join(', '):'None — start here'}
+**Delivers:** ${c.delivers}
+
+### Done when
+${c.done_when.map(dw=>`- [ ] ${dw}`).join('\n')}
+
+### Prompt (${agentNames[agentKey]})
+
+${prompt?prompt.prompt.split('\n').map(l=>'    '+l).join('\n'):''}
+`;}).join('\n')}
+
+---
+
+## Launch Checklist
+
+${data.launch_checklist.categories.map(cat=>`### ${cat.name}${cat.mandatory?' *(Required)*':''}
+${cat.items.map(item=>`- [ ] ${item.task}`).join('\n')}`).join('\n\n')}
+
+---
+*Generated by Vibestudio · Resume by importing this file*
+`;
+
+  const blob=new Blob([md],{type:'text/markdown'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`vibestudio-${ideaKey}-build-plan.md`;
+  a.click();
+}
+
+// ── NARRATION ──
+const NARRATION = {
+  ideation: "Every great product starts with a clear problem. Before a single line of code gets written, we need to deeply understand who you're building for, what pain you're solving, and what success actually looks like. Watch as your raw idea gets turned into a structured product kernel — the foundation everything else is built on.",
+  features: "Most products fail because they try to do everything at once. This phase is about making deliberate choices — separating what's essential from what can wait. We'll suggest industry-standard features for your product type, flag anything that's more complex than it looks, and park the rest for future versions. You can move features between tiers or remove them entirely.",
+  agent: "The coding agent you choose changes how your entire build plan gets structured — how big each prompt should be, what format it needs, how much context to carry between sessions. Step-by-step agents like Cursor work best with smaller focused chunks. One-shot agents like Bolt work best with larger spec-style prompts. Pick your agent and everything downstream adapts.",
+  stack: "Every decision you make in code depends on your foundation. Get this wrong and you're rebuilding things later. We'll recommend the right tools for your specific product — based on what you're building, what features you need, and which agent you chose — and explain every decision in plain English. You can override anything, but we'll tell you the trade-offs.",
+  chunks: "You can't build a product in one session. This phase breaks your entire product into ordered, dependency-aware chunks — each one sized for a single agent session. Every chunk has a clear definition of done so you know exactly when it's complete before moving to the next. Nothing gets built on a shaky foundation.",
+  prompts: "This is the payoff. Every chunk becomes a fully-formed prompt your agent can execute without you needing to add anything. The context, the constraints, the technical spec, the done-when checklist — all of it is already in there. Copy chunk 01, build it, come back for chunk 02. Never skip ahead.",
+  launch: "Shipping code is only half the job. Getting it live without breaking anything is the other half. This checklist is specific to your stack and your features — no generic advice. Required items must be done before you go live. Everything else is strongly recommended. Your v2 roadmap is waiting at the bottom.",
+};
+
+let narrationDismissed = {};
+
+function narrationCard(phaseId) {
+  const dismissed = narrationDismissed[phaseId];
+  if (dismissed) return '';
+  return `<div class="narration" id="narration-${phaseId}">
+    <div class="narration-label">What's happening here</div>
+    <div class="narration-text">${NARRATION[phaseId]}</div>
+    <button class="narration-dismiss" onclick="dismissNarration('${phaseId}')" title="Dismiss">×</button>
+  </div>`;
+}
+
+function dismissNarration(phaseId) {
+  narrationDismissed[phaseId] = true;
+  const el = document.getElementById('narration-'+phaseId);
+  if (el) { el.style.opacity='0'; el.style.transition='opacity .2s'; setTimeout(()=>el.remove(), 200); }
+}
+
+function showNarration(phaseId) {
+  narrationDismissed[phaseId] = false;
+  const existing = document.getElementById('narration-'+phaseId);
+  if (existing) { existing.remove(); }
+  const main = document.getElementById('main');
+  const firstChild = main.querySelector('.panel.active')?.firstElementChild;
+  if (!firstChild) return;
+  const card = document.createElement('div');
+  card.innerHTML = narrationCard(phaseId);
+  firstChild.parentNode.insertBefore(card.firstElementChild, firstChild);
+}
+
+function qBtn(phaseId) {
+  return `<button class="phase-q-btn" onclick="showNarration('${phaseId}')" title="What's happening here">?</button>`;
+}
+const TUT_STEPS = [
+  {
+    title: 'Welcome to Vibestudio',
+    body: 'This tool takes you from a raw idea to a fully chunked, agent-ready build plan in 7 phases. Each phase builds on the last — and everything gets saved to a markdown file you can download and resume anytime.',
+    target: null,
+  },
+  {
+    title: 'Start with your idea',
+    body: 'Type your product idea in plain English — as vague as you like. Vibestudio will ask clarifying questions, synthesise a product kernel, and give you an honest analysis of your idea.',
+    target: '#idea-ta',
+  },
+  {
+    title: 'Navigate phases here',
+    body: 'These are your 7 phases. Each one unlocks after you complete the previous. Your decisions — agent, stack, features — accumulate below so you always have context.',
+    target: '.sidebar',
+  },
+  {
+    title: 'Switch between demo ideas',
+    body: 'This demo has 3 pre-loaded product ideas showing different product types — a SaaS, a developer micro-tool, and a marketplace. Switch between them to see how the output changes.',
+    target: '.idea-switcher',
+  },
+  {
+    title: "You're ready to start",
+    body: 'Hit "Analyse my idea" on the ideation phase to kick things off. The AI will generate questions, answers, your product kernel, and an idea analysis — all in real time.',
+    target: null,
+  },
+];
+
+let tutStep = 0;
+let tutDismissed = false;
+
+function buildTutHTML() {
+  const step = TUT_STEPS[tutStep];
+  const dots = TUT_STEPS.map((_,i) => `<div class="tut-dot ${i===tutStep?'on':''}"></div>`).join('');
+  const isLast = tutStep === TUT_STEPS.length - 1;
+  return `
+    <div class="tut-step">Step ${tutStep+1} of ${TUT_STEPS.length}</div>
+    <div class="tut-title">${step.title}</div>
+    <div class="tut-body">${step.body}</div>
+    <div class="tut-actions">
+      <div class="tut-dots">${dots}</div>
+      <button class="btn btn-primary" style="padding:8px 18px;font-size:13px" onclick="tutNext()">
+        ${isLast ? 'Get started →' : 'Next →'}
+      </button>
+      <button class="tut-skip" onclick="tutDismiss()">Skip tutorial</button>
+    </div>`;
+}
+
+function tutPositionSpotlight(target) {
+  const spot = document.getElementById('tut-spotlight');
+  if (!target || !spot) return;
+  const el = document.querySelector(target);
+  if (!el) { spot.style.display='none'; return; }
+  const r = el.getBoundingClientRect();
+  const pad = 6;
+  spot.style.display = 'block';
+  spot.style.top = (r.top - pad) + 'px';
+  spot.style.left = (r.left - pad) + 'px';
+  spot.style.width = (r.width + pad*2) + 'px';
+  spot.style.height = (r.height + pad*2) + 'px';
+}
+
+function showTutorial() {
+  if (tutDismissed) return;
+  const ov = document.getElementById('tut-overlay');
+  const box = document.getElementById('tut-box');
+  if (!ov || !box) return;
+  ov.classList.remove('hidden');
+  box.innerHTML = buildTutHTML();
+  tutPositionSpotlight(TUT_STEPS[tutStep].target);
+}
+
+function tutNext() {
+  tutStep++;
+  if (tutStep >= TUT_STEPS.length) { tutDismiss(); return; }
+  const box = document.getElementById('tut-box');
+  box.innerHTML = buildTutHTML();
+  tutPositionSpotlight(TUT_STEPS[tutStep].target);
+}
+
+function tutDismiss() {
+  tutDismissed = true;
+  const ov = document.getElementById('tut-overlay');
+  const spot = document.getElementById('tut-spotlight');
+  if (ov) ov.classList.add('hidden');
+  if (spot) spot.style.display = 'none';
+}
+
+// ── FEATURE MOVE BETWEEN TIERS ──
+// featureState holds current bucket assignments per ideaKey
+let featureState = {};
+
+function initFeatureState() {
+  const f = d().features;
+  featureState[ideaKey] = {
+    core: f.core.map((fi,i) => ({...fi, _id: ideaKey+'core'+i})),
+    should_have: f.should_have.map((fi,i) => ({...fi, _id: ideaKey+'should'+i})),
+    nice_to_have: f.nice_to_have.map((fi,i) => ({...fi, _id: ideaKey+'nice'+i})),
+  };
+}
+
+function getFeatureState() {
+  if (!featureState[ideaKey]) initFeatureState();
+  return featureState[ideaKey];
+}
+
+function moveFeature(id, fromBucket, toBucket) {
+  const state = getFeatureState();
+  const idx = state[fromBucket].findIndex(f => f._id === id);
+  if (idx === -1) return;
+  const [fi] = state[fromBucket].splice(idx, 1);
+  state[toBucket].push(fi);
+  rerenderFeatures();
+}
+
+function removeFeature(id, bucket) {
+  const state = getFeatureState();
+  const idx = state[bucket].findIndex(f => f._id === id);
+  if (idx !== -1) state[bucket].splice(idx, 1);
+  rerenderFeatures();
+}
+
+function rerenderFeatures() {
+  const state = getFeatureState();
+
+  function renderBucket(containerId, bucket, otherBuckets) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = '';
+    state[bucket].forEach(fi => {
+      const div = document.createElement('div');
+      div.className = 'fi';
+      div.draggable = true;
+      div.dataset.id = fi._id;
+      div.dataset.bucket = bucket;
+
+      const moveOptions = otherBuckets.map(b => {
+        const labels = {core:'→ Core', should_have:'→ Should have', nice_to_have:'→ Nice to have'};
+        return `<button class="fi-move-btn" onclick="event.stopPropagation();moveFeature('${fi._id}','${bucket}','${b}')">${labels[b]}</button>`;
+      }).join('');
+
+      div.innerHTML = `
+        <span class="fi-cx cx-${fi.complexity}">${fi.complexity}</span>
+        <div style="flex:1">
+          <div class="fi-name">${fi.name}</div>
+          <div class="fi-desc">${fi.description}</div>
+          <div style="display:flex;gap:4px;margin-top:.5rem;flex-wrap:wrap">${moveOptions}</div>
+        </div>
+        <span class="fi-remove" onclick="event.stopPropagation();removeFeature('${fi._id}','${bucket}')" title="Remove">×</span>`;
+
+      // drag events
+      div.addEventListener('dragstart', e => { e.dataTransfer.setData('id', fi._id); e.dataTransfer.setData('bucket', bucket); div.classList.add('dragging'); });
+      div.addEventListener('dragend', () => div.classList.remove('dragging'));
+      el.appendChild(div);
+    });
+
+    // drop zone
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('id');
+      const from = e.dataTransfer.getData('bucket');
+      if (from !== bucket) moveFeature(id, from, bucket);
+    });
+  }
+
+  renderBucket('feat-core', 'core', ['should_have','nice_to_have']);
+  renderBucket('feat-should', 'should_have', ['core','nice_to_have']);
+  renderBucket('feat-nice', 'nice_to_have', ['core','should_have']);
+}
+
+// ── INIT ──
+
+// Fix switchIdea to properly reset ALL state - replaces the broken override chain
+function switchIdea(key, btn) {
+  ideaKey = key;
+  phase = 'ideation';
+  unlocked = ['ideation'];
+  dec = {}; clState = {}; techView = false; animating = false;
+  narrationDismissed = {};
+  featureState = {};
+  tutStep = 0; tutDismissed = false;
+  document.querySelectorAll('.isw-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNav(); renderDec(); renderPhase('ideation');
+}
+
+// ── CLAUDE-OPTIMISED PROMPT WRAPPER ──
+// When the user selects Claude Code, we wrap prompts with Claude-specific XML structure
+function formatPromptForAgent(rawPrompt, chunkTitle, chunkId, totalChunks, agentKey) {
+  if (agentKey !== 'claude_code') return rawPrompt;
+
+  return `<task>
+  Build Chunk ${chunkId} of ${totalChunks}: ${chunkTitle}
+</task>
+
+<context>
+  This is part of a structured vibe coding build plan generated by Vibestudio.
+  Each chunk builds on the previous ones. Do not refactor or change anything
+  from previous chunks unless explicitly asked. Focus only on what this chunk
+  specifies.
+</context>
+
+<instructions>
+${rawPrompt.split('\n').map(l => '  ' + l).join('\n')}
+</instructions>
+
+<constraints>
+  - Only build what is specified in this chunk
+  - Do not add features, routes, or components not mentioned here
+  - If you are unsure about anything, implement the simplest correct version
+  - After completing, list what was built and confirm the done-when items
+</constraints>`;
+}
+
+// ── UI CONVERSATION PROMPT SUFFIX ──
+// Adds UI/design conversation to each prompt so the agent doesn't make arbitrary choices
+const UI_CONVERSATION = {
+  invoice: {
+    tone: 'clean, professional, trustworthy',
+    audience: 'solo freelancers — not developers',
+    palette: 'white backgrounds, dark text, a single brand accent colour',
+    typography: 'readable sans-serif, generous line height, no decorative fonts',
+    layout: 'simple single-column layouts, clear hierarchy, nothing cluttered',
+    components: 'standard form inputs, clear CTA buttons, status badges with colour coding',
+    avoid: 'dashboards that look like accounting software, overly complex navigation, dark mode',
+  },
+  apicost: {
+    tone: 'developer-native, minimal, data-dense',
+    audience: 'technical developers who appreciate clean interfaces',
+    palette: 'dark theme (near-black backgrounds), monospace for numbers and code, muted accent',
+    typography: 'monospace for data, clean sans-serif for UI, tight spacing',
+    layout: 'data tables, metric cards, charts — density is fine, clutter is not',
+    components: 'inline stat cards, collapsible sections, minimal modals, toast notifications',
+    avoid: 'marketing-style layouts, rounded colourful cards, anything that looks like a SaaS landing page',
+  },
+  fitness: {
+    tone: 'warm, energetic, approachable — builds trust with both trainers and clients',
+    audience: 'two types: independent fitness trainers and their clients — neither is technical',
+    palette: 'clean white or off-white, one strong accent (could be a vibrant green, orange, or teal), photography-forward',
+    typography: 'friendly but professional — slightly rounded sans-serif, readable body text',
+    layout: 'card-based for trainer discovery, clean booking widgets, mobile-first',
+    components: 'trainer profile cards with photo, star ratings, booking calendar widget, clear price display',
+    avoid: 'gym-bro aesthetics, overly sporty design, dark themes, anything that feels like a fitness tracking app',
+  },
+};
+
+function uiConversationSuffix(ideaKey, chunkId) {
+  // Only add UI conversation to chunks that build visible UI (not pure backend chunks)
+  const backendOnlyChunks = { apicost: [3] }; // polling is pure backend
+  if (backendOnlyChunks[ideaKey]?.includes(chunkId)) return '';
+
+  const ui = UI_CONVERSATION[ideaKey];
+  if (!ui) return '';
+
+  return `
+
+UI & design guidance for this chunk:
+- Tone: ${ui.tone}
+- Audience: ${ui.audience}
+- Colour palette: ${ui.palette}
+- Typography: ${ui.typography}
+- Layout approach: ${ui.layout}
+- Component style: ${ui.components}
+- Avoid: ${ui.avoid}
+
+Apply this guidance to all UI you build in this chunk. Do not invent your own design direction.`;
+}
+
+// ── OVERRIDE buildPrompts TO USE FORMATTED PROMPTS ──
+function buildPrompts() {
+  const prompts = d().prompts;
+  const chunks = d().chunks;
+  const agentKey = dec.agent || d().agent.recommended;
+  const agentNames = {cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'};
+  const agentName = agentNames[agentKey];
+
+  const blocks = prompts.map(p => {
+    const chunk = chunks.find(c => c.id === p.chunk_id);
+    const formattedPrompt = formatPromptForAgent(
+      p.prompt + uiConversationSuffix(ideaKey, p.chunk_id),
+      chunk ? chunk.title : 'Chunk ' + p.chunk_id,
+      p.chunk_id,
+      chunks.length,
+      agentKey
+    );
+    return `<div class="prompt-block" id="pb-${p.chunk_id}">
+      <div class="prompt-hdr" onclick="togglePrompt(${p.chunk_id})">
+        <div class="prompt-cnum">${p.chunk_id}</div>
+        <div class="prompt-ttl">${chunk ? chunk.title : 'Chunk ' + p.chunk_id}</div>
+        <button class="copy-btn" id="cpbtn-${p.chunk_id}" onclick="event.stopPropagation();copyPrompt(${p.chunk_id},'${escQ(formattedPrompt)}')">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <div class="prompt-txt" id="pt-${p.chunk_id}">${formattedPrompt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  ${narrationCard('prompts')}
+  <div class="phase-eyebrow">Phase 06 · Prompt Generation</div>
+  <div class="phase-title">Your agent-ready prompts ${qBtn('prompts')}</div>
+  <div class="phase-desc">One prompt per chunk, formatted for <strong style="color:var(--amber2)">${agentName}</strong>. Expand to preview, copy to paste directly into your agent.</div>
+
+  <div class="prompt-tip">
+    <div class="prompt-tip-icon">💡</div>
+    <div class="prompt-tip-body"><strong>How to use these:</strong> Start with Chunk 01. Copy the prompt, paste into ${agentName}, and build until every done-when item is complete. Return here for Chunk 02. Never skip ahead — each chunk builds on the last.${agentKey === 'claude_code' ? ' <strong>Claude-optimised:</strong> Prompts use XML structure for best results with Claude Code.' : ''}</div>
+  </div>
+
+  ${blocks}
+
+  <div class="btn-row" style="margin-top:1.25rem">
+    <button class="btn btn-primary" onclick="advance('launch')">Ready — go to launch checklist →</button>
+    <button class="btn btn-ghost" onclick="goPhase('chunks')">← Back</button>
+  </div>`;
+}
+
+function escQ(s) {
+  // Store prompt text as data attribute - encode for HTML attribute
+  return ''; // we'll use a different copy mechanism
+}
+
+function copyPrompt(id, _unused) {
+  // Get the raw text from the pre element (already rendered)
+  const el = document.getElementById('pt-'+id);
+  if (!el) return;
+  // Get text content, decode HTML entities
+  const tmp = document.createElement('div');
+  tmp.innerHTML = el.innerHTML;
+  const text = tmp.textContent || tmp.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('cpbtn-'+id);
+    btn.textContent = 'Copied!'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 2000);
+  });
+}
+
+// ── OVERRIDE exportMD to use formatted prompts ──
+function exportMD() {
+  const data = d();
+  const names = {invoice:'Invoice Tracker',apicost:'API Cost Monitor',fitness:'Fitness Marketplace'};
+  const agentKey = dec.agent || data.agent.recommended;
+  const agentNames = {cursor:'Cursor',claude_code:'Claude Code',windsurf:'Windsurf',bolt:'Bolt',lovable:'Lovable',v0:'v0'};
+  const now = new Date().toISOString();
+
+  let md = `---
+vibe-version: 1.0
+created: ${now}
+product: ${names[ideaKey]}
+stage: launch-checklist
+agent: ${agentKey}
+stack: ${data.stack.layers[0].choice} + ${data.stack.layers[2].choice}
+chunks-total: ${data.chunks.length}
+---
+
+# ${names[ideaKey]} — Vibestudio Build Plan
+
+## Raw Idea
+
+> ${data.raw}
+
+## Product Kernel
+
+| Field | Detail |
+|-------|--------|
+| Problem | ${data.ideation.kernel.problem} |
+| Solution | ${data.ideation.kernel.solution} |
+| Target User | ${data.ideation.kernel.target_user} |
+| Value Prop | ${data.ideation.kernel.value_prop} |
+| Out of Scope | ${data.ideation.kernel.out_of_scope} |
+| Success Metric | ${data.ideation.kernel.success_metric} |
+
+## MVP Features
+
+### Core (must ship)
+${data.features.core.map(f => `- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+### Should Have
+${data.features.should_have.map(f => `- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+### Nice to Have
+${data.features.nice_to_have.map(f => `- **${f.name}** *(${f.complexity})*: ${f.description}`).join('\n')}
+
+## Roadmap
+
+${data.features.roadmap.map(r => `- **${r.version}** — ${r.name}: ${r.why_parked}`).join('\n')}
+
+## Stack
+
+| Layer | Choice | Reasoning |
+|-------|--------|-----------|
+${data.stack.layers.map(l => `| ${l.layer} | ${l.choice} | ${l.reason} |`).join('\n')}
+
+## Architecture
+
+### Pages
+${data.stack.architecture.pages.map(p => `- \`${p}\``).join('\n')}
+
+### Data Model
+${data.stack.architecture.data_model.map(t => `- **${t.table}**: ${t.fields.join(', ')} — *${t.relates_to}*`).join('\n')}
+
+### Auth Flow
+${data.stack.architecture.auth_flow}
+
+### External Services
+${data.stack.architecture.external_services.map(s => `- ${s}`).join('\n')}
+
+## Build Plan
+
+${data.chunks.map(c => {
+  const promptData = data.prompts.find(p => p.chunk_id === c.id);
+  const rawPrompt = promptData ? promptData.prompt + uiConversationSuffix(ideaKey, c.id) : '';
+  const formattedPrompt = formatPromptForAgent(rawPrompt, c.title, c.id, data.chunks.length, agentKey);
+  return `---
+
+## Chunk ${String(c.id).padStart(2,'0')} — ${c.title}
+
+**Feature:** ${c.feature}
+**Complexity:** ${c.complexity}
+**Depends on:** ${c.depends_on.length ? 'Chunks ' + c.depends_on.join(', ') : 'None — start here'}
+**Delivers:** ${c.delivers}
+
+### Done when
+${c.done_when.map(dw => `- [ ] ${dw}`).join('\n')}
+
+### Prompt (${agentNames[agentKey]})
+
+${formattedPrompt.split('\n').map(l => '    ' + l).join('\n')}
+`;
+}).join('\n')}
+
+---
+
+## Launch Checklist
+
+${data.launch_checklist.categories.map(cat => `### ${cat.name}${cat.mandatory ? ' *(Required)*' : ''}
+${cat.items.map(item => `- [ ] ${item.task}`).join('\n')}`).join('\n\n')}
+
+---
+*Generated by Vibestudio · Resume by importing this file*
+`;
+
+  const blob = new Blob([md], {type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vibestudio-${ideaKey}-build-plan.md`;
+  a.click();
+}
+
+renderNav(); renderDec(); renderPhase('ideation');
+document.body.insertAdjacentHTML('beforeend', `
+  <div class="tut-spotlight" id="tut-spotlight" style="display:none"></div>
+  <div class="tut-overlay" id="tut-overlay">
+    <div class="tut-box" id="tut-box"></div>
+  </div>`);
+setTimeout(showTutorial, 600);
+</script>
+</body>
+</html>

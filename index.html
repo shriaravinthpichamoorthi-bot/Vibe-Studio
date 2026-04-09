@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibestudio — From idea to shipped product</title>
+<meta name="description" content="A structured, AI-powered product studio that takes you from raw idea to agent-ready build plan. No technical knowledge required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0b0a;--bg2:#131211;--bg3:#1a1917;--bg4:#222120;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e8e5e0;--text2:#a09d98;--text3:#6a6760;--text4:#3a3835;
+  --amber:#d4621a;--amber2:#f0a060;--amber3:rgba(212,98,26,0.14);
+  --green:#3a8a5a;--green2:rgba(58,138,90,0.14);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(12,11,10,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 2rem;z-index:100;gap:1rem}
+.nav-logo{font-family:'Instrument Serif',serif;font-size:20px;color:var(--text);display:flex;align-items:center}
+.nav-logo em{color:var(--amber);font-style:italic}
+.nav-links{display:flex;gap:1.5rem;margin-left:auto;align-items:center}
+.nav-link{font-size:13px;color:var(--text3);text-decoration:none;transition:color .15s}
+.nav-link:hover{color:var(--text)}
+.nav-cta{background:var(--amber);color:#fff;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;transition:background .15s}
+.nav-cta:hover{background:#b8521a;color:#fff}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(212,98,26,.12) 0%,transparent 70%);pointer-events:none}
+.hero-chip{display:inline-flex;align-items:center;gap:.5rem;background:var(--amber3);border:1px solid rgba(212,98,26,.25);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:500;color:var(--amber2);letter-spacing:.04em;margin-bottom:1.5rem;text-transform:uppercase}
+.hero-title{font-family:'Instrument Serif',serif;font-size:clamp(40px,6vw,72px);line-height:1.1;color:var(--text);margin-bottom:1rem;letter-spacing:-.5px}
+.hero-title em{color:var(--amber);font-style:italic}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:var(--text3);max-width:560px;margin:0 auto 2.5rem;line-height:1.65}
+.hero-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn-hero{padding:13px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-hero-primary{background:var(--amber);color:#fff;border:none}
+.btn-hero-primary:hover{background:#b8521a}
+.btn-hero-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-hero-ghost:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+
+/* PHASES STRIP */
+.phases-strip{display:flex;gap:0;overflow-x:auto;padding:0 2rem;margin:0 auto;max-width:900px;width:100%}
+.phase-pill{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.75rem 1rem;position:relative}
+.phase-pill::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--text4);font-size:12px}
+.phase-pill:last-child::after{display:none}
+.pp-num{width:28px;height:28px;border-radius:50%;background:var(--amber3);border:1px solid rgba(212,98,26,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--amber2)}
+.pp-label{font-size:11px;color:var(--text3);white-space:nowrap}
+
+/* SECTION */
+section{padding:5rem 2rem;max-width:1000px;margin:0 auto}
+.section-eyebrow{font-size:11px;font-weight:500;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.section-title{font-family:'Instrument Serif',serif;font-size:clamp(28px,4vw,42px);color:var(--text);margin-bottom:1rem;line-height:1.2}
+.section-body{font-size:15px;color:var(--text3);max-width:520px;line-height:1.65}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:2.5rem}
+.step-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--amber3);border:1px solid rgba(212,98,26,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--amber2);margin-bottom:1rem}
+.step-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:.4rem}
+.step-body{font-size:13px;color:var(--text3);line-height:1.55}
+
+/* WHO IT'S FOR */
+.audience-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2.5rem}
+.aud-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+.aud-card.highlight{border-color:rgba(212,98,26,.3);background:var(--amber3)}
+.aud-label{font-size:11px;font-weight:500;color:var(--amber2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.aud-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:.4rem}
+.aud-quote{font-size:13px;color:var(--text3);font-style:italic;margin-bottom:1rem}
+.aud-list{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.aud-list li{font-size:13px;color:var(--text2);display:flex;gap:.5rem}
+.aud-list li::before{content:'→';color:var(--amber);flex-shrink:0}
+
+/* WHAT YOU GET */
+.output-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:2.5rem}
+.out-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
+.out-icon{font-size:22px;margin-bottom:.75rem}
+.out-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.3rem}
+.out-body{font-size:12.5px;color:var(--text3);line-height:1.5}
+
+/* VS */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2.5rem}
+.vs-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
+.vs-card.us{border-color:rgba(212,98,26,.3)}
+.vs-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.vs-label.them{color:var(--text4)}
+.vs-label.us{color:var(--amber2)}
+.vs-item{display:flex;gap:.6rem;padding:.3rem 0;font-size:13px;color:var(--text2)}
+.vs-x{color:var(--red);}
+.vs-check{color:var(--green);}
+
+/* DEMO SECTION */
+.demo-section{padding:5rem 2rem;text-align:center;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.demo-section .section-title{margin-bottom:.75rem}
+.demo-section .section-body{margin:0 auto 2rem}
+
+/* FOOTER */
+footer{padding:2rem;text-align:center;border-top:1px solid var(--border)}
+.footer-logo{font-family:'Instrument Serif',serif;font-size:18px;color:var(--text3);margin-bottom:.5rem}
+.footer-logo em{color:var(--amber);font-style:italic}
+.footer-sub{font-size:12px;color:var(--text4)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .audience-grid,.vs-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  nav{padding:0 1rem}
+  .hero-actions{flex-direction:column;align-items:center}
+}
+
+/* FADE IN ANIMATION */
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">vibe<em>studio</em></div>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How it works</a>
+    <a href="#who" class="nav-link">Who it's for</a>
+    <a href="#output" class="nav-link">What you get</a>
+    <a href="demo.html" class="nav-cta">Try the demo →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Now in demo</div>
+  <h1 class="hero-title">From napkin idea<br>to <em>shippable product</em></h1>
+  <p class="hero-sub">Vibestudio is a structured, AI-powered product studio that walks you through every decision — from raw idea to agent-ready build plan — in 7 phases.</p>
+  <div class="hero-actions">
+    <a href="demo.html" class="btn-hero btn-hero-primary">Try the demo →</a>
+    <a href="#how" class="btn-hero btn-hero-ghost">See how it works</a>
+  </div>
+
+  <div style="margin-top:3.5rem;width:100%;max-width:860px">
+    <div class="phases-strip">
+      <div class="phase-pill"><div class="pp-num">1</div><div class="pp-label">Ideation</div></div>
+      <div class="phase-pill"><div class="pp-num">2</div><div class="pp-label">Feature Scoping</div></div>
+      <div class="phase-pill"><div class="pp-num">3</div><div class="pp-label">Agent Selection</div></div>
+      <div class="phase-pill"><div class="pp-num">4</div><div class="pp-label">Stack & Architecture</div></div>
+      <div class="phase-pill"><div class="pp-num">5</div><div class="pp-label">Build Chunking</div></div>
+      <div class="phase-pill"><div class="pp-num">6</div><div class="pp-label">Prompt Generation</div></div>
+      <div class="phase-pill"><div class="pp-num">7</div><div class="pp-label">Launch Checklist</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="fade-up">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">Seven phases. One build plan.</h2>
+  <p class="section-body">Each phase builds on the last. Every decision gets saved to a markdown file you can download and resume anytime — even pick up in a different session.</p>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-title">Ideation</div>
+      <div class="step-body">Type your raw idea in plain English. The AI asks targeted questions, then synthesises a product kernel and gives an honest analysis of your idea's strengths and risks.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-title">Feature scoping</div>
+      <div class="step-body">We suggest industry-standard features for your product type, flagging anything that's more complex than it looks. You decide what ships in v1 and what waits for v2.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-title">Agent selection</div>
+      <div class="step-body">Pick the coding agent you'll use. This changes how your build is chunked, how big each prompt is, and what format it needs. Cursor, Claude Code, Bolt, Lovable and more.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-title">Stack & architecture</div>
+      <div class="step-body">Get a recommended tech stack specific to your product — with plain-English explanations for non-technical founders and honest trade-offs if you override anything.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <div class="step-title">Build chunking</div>
+      <div class="step-body">Your product gets broken into ordered, dependency-aware chunks — each one a single agent session with a clear definition of done. Nothing gets built on a shaky foundation.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">6</div>
+      <div class="step-title">Prompt generation</div>
+      <div class="step-body">Every chunk becomes a fully-formed, agent-ready prompt. Context, constraints, technical spec, and done-when checklist all included. Copy, paste, build. No back and forth.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">7</div>
+      <div class="step-title">Launch checklist</div>
+      <div class="step-body">A deployment checklist specific to your stack and features — not generic advice. Required items are flagged. Your v2 roadmap surfaces at the end to keep momentum going.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section id="who" class="fade-up">
+  <div class="section-eyebrow">Who it's for</div>
+  <h2 class="section-title">Two kinds of builders.</h2>
+  <p class="section-body">Vibestudio works for both — it meets you where you are and scales to your technical level.</p>
+  <div class="audience-grid">
+    <div class="aud-card highlight">
+      <div class="aud-label">Non-technical founder</div>
+      <div class="aud-title">You have an idea. You can't build it.</div>
+      <div class="aud-quote">"I need something that holds my hand through every decision."</div>
+      <ul class="aud-list">
+        <li>Guided through every phase in plain English</li>
+        <li>AI suggests features, stack, and architecture</li>
+        <li>Prompts ready to paste into Bolt or Lovable</li>
+        <li>Launch checklist explains every step</li>
+        <li>No jargon — ever</li>
+      </ul>
+    </div>
+    <div class="aud-card">
+      <div class="aud-label">Technical builder</div>
+      <div class="aud-title">You can build it. You need structure.</div>
+      <div class="aud-quote">"I want a systematic approach, not a blank canvas."</div>
+      <ul class="aud-list">
+        <li>Move fast — skip the hand-holding</li>
+        <li>Override AI suggestions with trade-off analysis</li>
+        <li>Cursor, Claude Code, Windsurf prompt formats</li>
+        <li>Field-level data model control</li>
+        <li>Chunking granularity you control</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU GET -->
+<section id="output" class="fade-up">
+  <div class="section-eyebrow">What you get</div>
+  <h2 class="section-title">One file. Everything in it.</h2>
+  <p class="section-body">At the end of each session you download a markdown file. It's your product brief, your build plan, your prompts, and your launch checklist — all in one. Import it anytime to resume.</p>
+  <div class="output-grid">
+    <div class="out-card">
+      <div class="out-icon">📋</div>
+      <div class="out-title">Product brief</div>
+      <div class="out-body">Your product kernel — problem, solution, target user, value prop, scope, and success metric. The north star for every decision downstream.</div>
+    </div>
+    <div class="out-card">
+      <div class="out-icon">🗂</div>
+      <div class="out-title">Feature list</div>
+      <div class="out-body">MVP features with complexity ratings, pressure flags on anything tricky, and a v2/v3 roadmap so nothing gets lost.</div>
+    </div>
+    <div class="out-card">
+      <div class="out-icon">🏗</div>
+      <div class="out-title">Architecture</div>
+      <div class="out-body">Pages, data model, auth flow, and external services — specific to your product and stack, not a generic template.</div>
+    </div>
+    <div class="out-card">
+      <div class="out-icon">📦</div>
+      <div class="out-title">Build plan</div>
+      <div class="out-body">Ordered, dependency-aware chunks with done-when checklists. Each chunk knows what came before and what it enables next.</div>
+    </div>
+    <div class="out-card">
+      <div class="out-icon">⚡</div>
+      <div class="out-title">Agent prompts</div>
+      <div class="out-body">One fully-formed prompt per chunk, formatted for your chosen agent. Copy and paste — nothing to add or clarify.</div>
+    </div>
+    <div class="out-card">
+      <div class="out-icon">🚀</div>
+      <div class="out-title">Launch checklist</div>
+      <div class="out-body">Stack-specific checklist covering environment, database, auth, payments, security, and go-live. Required items flagged clearly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- VS -->
+<section class="fade-up">
+  <div class="section-eyebrow">Why not just use ChatGPT?</div>
+  <h2 class="section-title">Nobody owns the workflow layer.</h2>
+  <p class="section-body">Talking to an LLM gives you fragments. Vibestudio gives you a complete, resumable, agent-specific build plan.</p>
+  <div class="vs-grid">
+    <div class="vs-card">
+      <div class="vs-label them">Talking to an LLM directly</div>
+      <div class="vs-item"><span class="vs-x">✗</span> No memory of your product between sessions</div>
+      <div class="vs-item"><span class="vs-x">✗</span> You repeat context every time</div>
+      <div class="vs-item"><span class="vs-x">✗</span> No structure — just conversation</div>
+      <div class="vs-item"><span class="vs-x">✗</span> Outputs are fragments, not a plan</div>
+      <div class="vs-item"><span class="vs-x">✗</span> No agent-specific prompt formatting</div>
+      <div class="vs-item"><span class="vs-x">✗</span> No export to resume later</div>
+    </div>
+    <div class="vs-card us">
+      <div class="vs-label us">Vibestudio</div>
+      <div class="vs-item"><span class="vs-check">✓</span> Persistent MD file — never lose context</div>
+      <div class="vs-item"><span class="vs-check">✓</span> Resume from any phase, any time</div>
+      <div class="vs-item"><span class="vs-check">✓</span> 7-phase structured build system</div>
+      <div class="vs-item"><span class="vs-check">✓</span> Complete, ordered build plan</div>
+      <div class="vs-item"><span class="vs-check">✓</span> Agent-specific format and chunking</div>
+      <div class="vs-item"><span class="vs-check">✓</span> Download and reimport MD to continue</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO CTA -->
+<div class="demo-section">
+  <div class="section-eyebrow">Try it now</div>
+  <h2 class="section-title" style="margin-bottom:.75rem">See it working in 3 minutes</h2>
+  <p class="section-body">The demo walks through three real product ideas — a SaaS, a developer tool, and a marketplace. No signup, no credit card. Just open it and explore.</p>
+  <a href="demo.html" class="btn-hero btn-hero-primary" style="margin-top:1.5rem">Open the demo →</a>
+</div>
+
+<footer>
+  <div class="footer-logo">vibe<em>studio</em></div>
+  <div class="footer-sub">From idea to shipped product. No technical knowledge required.</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
