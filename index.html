@@ -4,317 +4,454 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vibestudio — From idea to shipped product</title>
-<meta name="description" content="A structured, AI-powered product studio that takes you from raw idea to agent-ready build plan. No technical knowledge required.">
+<meta name="description" content="A structured, AI-powered product studio that takes you from raw idea to agent-ready build plan in 7 phases. No technical knowledge required.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0b0a;--bg2:#131211;--bg3:#1a1917;--bg4:#222120;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#e8e5e0;--text2:#a09d98;--text3:#6a6760;--text4:#3a3835;
-  --amber:#d4621a;--amber2:#f0a060;--amber3:rgba(212,98,26,0.14);
-  --green:#3a8a5a;--green2:rgba(58,138,90,0.14);
+  --bg:#080807;--bg2:#0f0e0d;--bg3:#161513;--bg4:#1e1c1a;--bg5:#272421;--bg6:#302d2a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--border3:rgba(255,255,255,0.18);
+  --text:#edeae4;--text2:#b8b4ac;--text3:#8a8680;--text4:#5c5a56;
+  --amber:#d4601a;--amber2:#f09050;--amber3:rgba(212,96,26,0.14);--amber4:rgba(212,96,26,0.07);
+  --green:#3d9460;--green2:rgba(61,148,96,0.14);
+  --sans:'DM Sans',sans-serif;--serif:'Fraunces',serif;--mono:'DM Mono',monospace;
+  --ease:cubic-bezier(0.22,1,0.36,1);
 }
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--amber3);color:var(--text)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--bg6)}
+a{color:inherit;text-decoration:none}
+
+/* GRAIN */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E")}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(12,11,10,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 2rem;z-index:100;gap:1rem}
-.nav-logo{font-family:'Instrument Serif',serif;font-size:20px;color:var(--text);display:flex;align-items:center}
-.nav-logo em{color:var(--amber);font-style:italic}
-.nav-links{display:flex;gap:1.5rem;margin-left:auto;align-items:center}
-.nav-link{font-size:13px;color:var(--text3);text-decoration:none;transition:color .15s}
-.nav-link:hover{color:var(--text)}
-.nav-cta{background:var(--amber);color:#fff;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;transition:background .15s}
-.nav-cta:hover{background:#b8521a;color:#fff}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 2.5rem;transition:background .4s var(--ease),border-color .4s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(8,8,7,.9);border-color:var(--border);backdrop-filter:blur(20px)}
+.nav-i{display:flex;align-items:center;width:100%;max-width:1200px;margin:0 auto}
+.logo{font-family:var(--serif);font-size:21px;font-weight:700;letter-spacing:-.3px}
+.logo em{color:var(--amber);font-style:italic;font-weight:300}
+.nav-links{display:flex;gap:2rem;margin-left:auto;align-items:center}
+.nl{font-size:14px;color:var(--text2);transition:color .2s;letter-spacing:.01em}
+.nl:hover{color:var(--text)}
+.nav-btn{background:var(--amber);color:#fff;padding:8px 22px;border-radius:8px;font-size:14px;font-weight:500;transition:all .2s;border:none;cursor:pointer}
+.nav-btn:hover{background:#b8521a;transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,96,26,.3)}
+@media(max-width:680px){.nl{display:none}}
 
 /* HERO */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem 4rem;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(212,98,26,.12) 0%,transparent 70%);pointer-events:none}
-.hero-chip{display:inline-flex;align-items:center;gap:.5rem;background:var(--amber3);border:1px solid rgba(212,98,26,.25);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:500;color:var(--amber2);letter-spacing:.04em;margin-bottom:1.5rem;text-transform:uppercase}
-.hero-title{font-family:'Instrument Serif',serif;font-size:clamp(40px,6vw,72px);line-height:1.1;color:var(--text);margin-bottom:1rem;letter-spacing:-.5px}
-.hero-title em{color:var(--amber);font-style:italic}
-.hero-sub{font-size:clamp(15px,2vw,18px);color:var(--text3);max-width:560px;margin:0 auto 2.5rem;line-height:1.65}
-.hero-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
-.btn-hero{padding:13px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem}
-.btn-hero-primary{background:var(--amber);color:#fff;border:none}
-.btn-hero-primary:hover{background:#b8521a}
-.btn-hero-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
-.btn-hero-ghost:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9rem 2rem 6rem;text-align:center;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 75% 55% at 50% 35%,#000 40%,transparent 100%);pointer-events:none}
+.hero-glow{position:absolute;top:15%;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(212,96,26,.1) 0%,transparent 65%);pointer-events:none}
+.hero-c{position:relative;z-index:1;max-width:820px}
+.h-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--amber4);border:1px solid rgba(212,96,26,.2);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:500;color:var(--amber2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2rem;animation:fu .8s var(--ease) .1s both}
+.h-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+h1{font-family:var(--serif);font-size:clamp(48px,7.5vw,92px);font-weight:800;line-height:1.0;letter-spacing:-2.5px;color:var(--text);margin-bottom:1.5rem;animation:fu .8s var(--ease) .2s both}
+h1 em{color:var(--amber);font-style:italic;font-weight:300}
+h1 .sub{display:block;font-weight:300;font-style:italic;font-size:clamp(38px,6vw,76px);color:var(--text3);letter-spacing:-1.5px}
+.hero-p{font-size:clamp(16px,2vw,19px);color:var(--text2);max-width:500px;margin:0 auto 2.75rem;line-height:1.75;font-weight:300;animation:fu .8s var(--ease) .3s both}
+.hero-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;animation:fu .8s var(--ease) .4s both}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:14px 32px;border-radius:10px;font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;transition:all .2s var(--ease);border:none;letter-spacing:.01em}
+.btn-p{background:var(--amber);color:#fff}
+.btn-p:hover{background:#b8521a;transform:translateY(-2px);box-shadow:0 8px 32px rgba(212,96,26,.38)}
+.btn-g{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-g:hover{background:var(--bg4);border-color:var(--border3);color:var(--text);transform:translateY(-1px)}
 
-/* PHASES STRIP */
-.phases-strip{display:flex;gap:0;overflow-x:auto;padding:0 2rem;margin:0 auto;max-width:900px;width:100%}
-.phase-pill{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.75rem 1rem;position:relative}
-.phase-pill::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--text4);font-size:12px}
-.phase-pill:last-child::after{display:none}
-.pp-num{width:28px;height:28px;border-radius:50%;background:var(--amber3);border:1px solid rgba(212,98,26,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--amber2)}
-.pp-label{font-size:11px;color:var(--text3);white-space:nowrap}
+/* PHASE TRACK */
+.phase-wrap{width:100%;max-width:1020px;margin:5rem auto 0;position:relative;z-index:1;animation:fu .8s var(--ease) .55s both}
+.phase-label{font-family:var(--mono);font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.875rem;text-align:left;padding:0 .25rem}
+.phase-track{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg2)}
+.pi{flex:1;padding:1.125rem 1rem;border-right:1px solid var(--border);transition:background .2s;position:relative;cursor:default}
+.pi:last-child{border-right:none}
+.pi:hover{background:var(--bg3)}
+.pi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.pi:hover::before{transform:scaleX(1)}
+.pi-n{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:.375rem;letter-spacing:.04em}
+.pi-l{font-size:12.5px;font-weight:500;color:var(--text2);line-height:1.3}
+.pi:hover .pi-l{color:var(--text)}
+@media(max-width:800px){.phase-track{flex-wrap:wrap}.pi{flex:0 0 33.33%;border-bottom:1px solid var(--border)}.pi:nth-child(3n){border-right:none}}
+@media(max-width:480px){.pi{flex:0 0 50%}.pi:nth-child(3n){border-right:1px solid var(--border)}.pi:nth-child(even){border-right:none}}
 
-/* SECTION */
-section{padding:5rem 2rem;max-width:1000px;margin:0 auto}
-.section-eyebrow{font-size:11px;font-weight:500;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
-.section-title{font-family:'Instrument Serif',serif;font-size:clamp(28px,4vw,42px);color:var(--text);margin-bottom:1rem;line-height:1.2}
-.section-body{font-size:15px;color:var(--text3);max-width:520px;line-height:1.65}
+/* SECTIONS */
+.s{padding:7rem 2rem;position:relative}
+.si{max-width:1100px;margin:0 auto}
+.ey{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--amber2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.ey::after{content:'';height:1px;width:36px;background:var(--amber);opacity:.5}
+.st{font-family:var(--serif);font-size:clamp(30px,4vw,52px);font-weight:700;color:var(--text);letter-spacing:-1.2px;line-height:1.08;margin-bottom:1rem}
+.sb{font-size:16px;color:var(--text2);max-width:480px;line-height:1.75;font-weight:300}
 
-/* HOW IT WORKS */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:2.5rem}
-.step-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
-.step-num{width:32px;height:32px;border-radius:50%;background:var(--amber3);border:1px solid rgba(212,98,26,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--amber2);margin-bottom:1rem}
-.step-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:.4rem}
-.step-body{font-size:13px;color:var(--text3);line-height:1.55}
+/* STATS */
+.stats-s{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3rem 2rem}
+.stats-row{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg3);max-width:1100px;margin:0 auto}
+.stat{flex:1;padding:1.875rem 1.5rem;border-right:1px solid var(--border);text-align:center}
+.stat:last-child{border-right:none}
+.stat-n{font-family:var(--serif);font-size:42px;font-weight:800;color:var(--amber2);letter-spacing:-2px;line-height:1;margin-bottom:.4rem}
+.stat-l{font-size:13px;color:var(--text2);font-weight:300;line-height:1.45}
+@media(max-width:560px){.stats-row{flex-wrap:wrap}.stat{flex:0 0 50%;border-bottom:1px solid var(--border)}.stat:nth-child(even){border-right:none}.stat:nth-last-child(-n+2){border-bottom:none}}
 
-/* WHO IT'S FOR */
-.audience-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2.5rem}
-.aud-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
-.aud-card.highlight{border-color:rgba(212,98,26,.3);background:var(--amber3)}
-.aud-label{font-size:11px;font-weight:500;color:var(--amber2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
-.aud-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:.4rem}
-.aud-quote{font-size:13px;color:var(--text3);font-style:italic;margin-bottom:1rem}
-.aud-list{list-style:none;display:flex;flex-direction:column;gap:.4rem}
-.aud-list li{font-size:13px;color:var(--text2);display:flex;gap:.5rem}
-.aud-list li::before{content:'→';color:var(--amber);flex-shrink:0}
+/* HOW */
+.how-g{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:3.5rem}
+.hc{background:var(--bg2);padding:1.875rem 1.25rem;transition:background .2s;position:relative;overflow:hidden}
+.hc:hover{background:var(--bg3)}
+.hc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
+.hc:hover::after{transform:scaleX(1)}
+.hc-n{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:1.25rem;letter-spacing:.06em}
+.hc-t{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--text);margin-bottom:.625rem;line-height:1.2}
+.hc-b{font-size:13.5px;color:var(--text2);line-height:1.65;font-weight:300}
+@media(max-width:900px){.how-g{grid-template-columns:repeat(3,1fr)}.hc:nth-child(7){grid-column:span 3}}
+@media(max-width:540px){.how-g{grid-template-columns:1fr 1fr}.hc:nth-child(7){grid-column:span 2}}
 
-/* WHAT YOU GET */
-.output-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:2.5rem}
-.out-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
-.out-icon{font-size:22px;margin-bottom:.75rem}
-.out-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.3rem}
-.out-body{font-size:12.5px;color:var(--text3);line-height:1.5}
+/* WHO */
+.who-s{background:var(--bg2)}
+.who-g{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:3.5rem}
+.wc{border-radius:16px;padding:2.5rem;position:relative;overflow:hidden;transition:transform .3s var(--ease)}
+.wc:hover{transform:translateY(-4px)}
+.wc-a{background:var(--amber3);border:1px solid rgba(212,96,26,.2)}
+.wc-b{background:var(--bg3);border:1px solid var(--border2)}
+.wc::after{content:'';position:absolute;bottom:-80px;right:-80px;width:220px;height:220px;border-radius:50%;pointer-events:none}
+.wc-a::after{background:radial-gradient(circle,rgba(212,96,26,.15),transparent 70%)}
+.wc-b::after{background:radial-gradient(circle,rgba(255,255,255,.04),transparent 70%)}
+.wc-lbl{font-family:var(--mono);font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.875rem}
+.wc-lbl-a{color:var(--amber2)}
+.wc-lbl-b{color:var(--text2)}
+.wc-t{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);margin-bottom:.4rem;line-height:1.1;letter-spacing:-.7px}
+.wc-q{font-size:14px;color:var(--text2);font-style:italic;font-weight:300;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);line-height:1.6}
+.wc-ul{list-style:none;display:flex;flex-direction:column;gap:.625rem}
+.wc-ul li{font-size:14px;color:var(--text2);display:flex;gap:.625rem;align-items:flex-start;line-height:1.45}
+.wc-ul li::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:.48rem}
+.wc-a .wc-ul li::before{background:var(--amber)}
+.wc-b .wc-ul li::before{background:var(--text4)}
+@media(max-width:680px){.who-g{grid-template-columns:1fr}}
+
+/* OUTPUT */
+.out-g{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:3.5rem}
+.oc{background:var(--bg2);padding:2rem 1.75rem;transition:background .2s}
+.oc:hover{background:var(--bg3)}
+.oc-ico{width:40px;height:40px;border-radius:10px;background:var(--amber4);border:1px solid rgba(212,96,26,.2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:1.25rem}
+.oc-t{font-size:15px;font-weight:500;color:var(--text);margin-bottom:.5rem}
+.oc-b{font-size:13.5px;color:var(--text2);line-height:1.65;font-weight:300}
+@media(max-width:740px){.out-g{grid-template-columns:1fr 1fr}}
+@media(max-width:440px){.out-g{grid-template-columns:1fr}}
+
+/* MD SPLIT */
+.md-split{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:3.5rem}
+.md-block{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--text3)}
+.mdb-bar{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.25rem;border-bottom:1px solid var(--border);background:var(--bg3)}
+.mdb-dot{width:10px;height:10px;border-radius:50%}
+.mdb-fn{font-family:var(--mono);font-size:12px;color:var(--text2);margin-left:.25rem}
+.mdb-pre{padding:1.375rem 1.5rem;overflow-x:auto}
+.my{color:var(--amber2)}.mh1{color:var(--text);font-weight:500}.mh2{color:var(--text2)}.mk{color:var(--amber2)}.mv{color:var(--text2)}.mc{color:#5cc48a}.mco{color:var(--text3)}
+.md-props{display:flex;flex-direction:column;gap:2rem}
+.mp-t{font-size:16px;font-weight:500;color:var(--text);margin-bottom:.375rem}
+.mp-b{font-size:14px;color:var(--text2);line-height:1.65;font-weight:300}
+@media(max-width:780px){.md-split{grid-template-columns:1fr;gap:2.5rem}}
 
 /* VS */
-.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2.5rem}
-.vs-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem}
-.vs-card.us{border-color:rgba(212,98,26,.3)}
-.vs-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
-.vs-label.them{color:var(--text4)}
-.vs-label.us{color:var(--amber2)}
-.vs-item{display:flex;gap:.6rem;padding:.3rem 0;font-size:13px;color:var(--text2)}
-.vs-x{color:var(--red);}
-.vs-check{color:var(--green);}
+.vs-g{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:3.5rem}
+.vc{border-radius:14px;padding:2rem;border:1px solid var(--border);background:var(--bg3)}
+.vc-us{border-color:rgba(212,96,26,.25);background:linear-gradient(135deg,var(--amber4),var(--bg3) 60%)}
+.vc-hdr{display:flex;align-items:center;gap:.625rem;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.vc-lbl{font-family:var(--mono);font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+.vc-lbl-t{color:var(--text3)}.vc-lbl-u{color:var(--amber2)}
+.vc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.vc-dot-t{background:var(--text3)}.vc-dot-u{background:var(--amber)}
+.vi{display:flex;gap:.75rem;padding:.5rem 0;font-size:14px;color:var(--text2);align-items:flex-start;line-height:1.5}
+.vsym{font-size:12px;flex-shrink:0;margin-top:2px;font-family:var(--mono)}
+.vx{color:var(--text3)}.vck{color:var(--amber2)}
+@media(max-width:680px){.vs-g{grid-template-columns:1fr}}
 
-/* DEMO SECTION */
-.demo-section{padding:5rem 2rem;text-align:center;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.demo-section .section-title{margin-bottom:.75rem}
-.demo-section .section-body{margin:0 auto 2rem}
+/* CTA SECTION */
+.cta-s{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9rem 2rem;text-align:center;position:relative;overflow:hidden}
+.cta-s::before{content:'';position:absolute;top:-150px;left:50%;transform:translateX(-50%);width:800px;height:700px;background:radial-gradient(circle,rgba(212,96,26,.08),transparent 65%);pointer-events:none}
+.cta-si{position:relative;z-index:1}
+.cta-t{font-family:var(--serif);font-size:clamp(38px,6vw,70px);font-weight:700;letter-spacing:-2px;color:var(--text);margin-bottom:1rem;line-height:1.0}
+.cta-t em{color:var(--amber);font-style:italic;font-weight:300}
+.cta-p{font-size:18px;color:var(--text2);max-width:440px;margin:0 auto 2rem;line-height:1.65;font-weight:300}
+.cta-chips{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--bg4);border:1px solid var(--border2);padding:4px 13px;border-radius:20px;letter-spacing:.04em}
 
 /* FOOTER */
-footer{padding:2rem;text-align:center;border-top:1px solid var(--border)}
-.footer-logo{font-family:'Instrument Serif',serif;font-size:18px;color:var(--text3);margin-bottom:.5rem}
-.footer-logo em{color:var(--amber);font-style:italic}
-.footer-sub{font-size:12px;color:var(--text4)}
+footer{padding:3rem 2.5rem;border-top:1px solid var(--border);background:var(--bg)}
+.ft-i{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
+.ft-logo{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--text2)}
+.ft-logo em{color:var(--amber);font-style:italic;font-weight:300}
+.ft-sub{font-size:13px;color:var(--text3);margin-top:3px}
+.ft-links{display:flex;gap:1.75rem}
+.ft-link{font-size:13px;color:var(--text3);transition:color .2s}
+.ft-link:hover{color:var(--text2)}
 
-/* RESPONSIVE */
-@media(max-width:600px){
-  .audience-grid,.vs-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr}
-  nav{padding:0 1rem}
-  .hero-actions{flex-direction:column;align-items:center}
-}
-
-/* FADE IN ANIMATION */
-.fade-up{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-.fade-up.visible{opacity:1;transform:none}
+/* ANIMS */
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.rev{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.rev.v{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">vibe<em>studio</em></div>
-  <div class="nav-links">
-    <a href="#how" class="nav-link">How it works</a>
-    <a href="#who" class="nav-link">Who it's for</a>
-    <a href="#output" class="nav-link">What you get</a>
-    <a href="demo.html" class="nav-cta">Try the demo →</a>
+<nav id="nav">
+  <div class="nav-i">
+    <div class="logo">vibe<em>studio</em></div>
+    <div class="nav-links">
+      <a href="#how" class="nl">How it works</a>
+      <a href="#who" class="nl">Who it's for</a>
+      <a href="#output" class="nl">What you get</a>
+      <a href="demo.html" class="nav-btn">Try the demo →</a>
+    </div>
   </div>
 </nav>
 
 <!-- HERO -->
-<div class="hero">
-  <div class="hero-chip">Now in demo</div>
-  <h1 class="hero-title">From napkin idea<br>to <em>shippable product</em></h1>
-  <p class="hero-sub">Vibestudio is a structured, AI-powered product studio that walks you through every decision — from raw idea to agent-ready build plan — in 7 phases.</p>
-  <div class="hero-actions">
-    <a href="demo.html" class="btn-hero btn-hero-primary">Try the demo →</a>
-    <a href="#how" class="btn-hero btn-hero-ghost">See how it works</a>
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-c">
+    <div class="h-badge"><span class="h-badge-dot"></span>Now in demo</div>
+    <h1>From napkin idea<br><em>to shippable product</em><span class="sub">in 7 phases</span></h1>
+    <p class="hero-p">Vibestudio is the structured workflow layer for vibe coding. Walk from raw idea to agent-ready build plan — every decision documented, every prompt ready to paste.</p>
+    <div class="hero-btns">
+      <a href="demo.html" class="btn btn-p">Try the demo →</a>
+      <a href="#how" class="btn btn-g">See how it works</a>
+    </div>
   </div>
 
-  <div style="margin-top:3.5rem;width:100%;max-width:860px">
-    <div class="phases-strip">
-      <div class="phase-pill"><div class="pp-num">1</div><div class="pp-label">Ideation</div></div>
-      <div class="phase-pill"><div class="pp-num">2</div><div class="pp-label">Feature Scoping</div></div>
-      <div class="phase-pill"><div class="pp-num">3</div><div class="pp-label">Agent Selection</div></div>
-      <div class="phase-pill"><div class="pp-num">4</div><div class="pp-label">Stack & Architecture</div></div>
-      <div class="phase-pill"><div class="pp-num">5</div><div class="pp-label">Build Chunking</div></div>
-      <div class="phase-pill"><div class="pp-num">6</div><div class="pp-label">Prompt Generation</div></div>
-      <div class="phase-pill"><div class="pp-num">7</div><div class="pp-label">Launch Checklist</div></div>
+  <div class="phase-wrap rev d4">
+    <div class="phase-label">The 7-phase build system</div>
+    <div class="phase-track">
+      <div class="pi"><div class="pi-n">01</div><div class="pi-l">Ideation</div></div>
+      <div class="pi"><div class="pi-n">02</div><div class="pi-l">Feature Scoping</div></div>
+      <div class="pi"><div class="pi-n">03</div><div class="pi-l">Agent Selection</div></div>
+      <div class="pi"><div class="pi-n">04</div><div class="pi-l">Stack &amp; Architecture</div></div>
+      <div class="pi"><div class="pi-n">05</div><div class="pi-l">Build Chunking</div></div>
+      <div class="pi"><div class="pi-n">06</div><div class="pi-l">Prompt Generation</div></div>
+      <div class="pi"><div class="pi-n">07</div><div class="pi-l">Launch Checklist</div></div>
     </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-s">
+  <div class="stats-row rev">
+    <div class="stat"><div class="stat-n">7</div><div class="stat-l">Structured phases<br>from idea to shipped</div></div>
+    <div class="stat"><div class="stat-n">6</div><div class="stat-l">Coding agents supported<br>with native formatting</div></div>
+    <div class="stat"><div class="stat-n">1</div><div class="stat-l">Markdown file that holds<br>your entire build plan</div></div>
+    <div class="stat"><div class="stat-n">0</div><div class="stat-l">Technical knowledge<br>required to get started</div></div>
   </div>
 </div>
 
 <!-- HOW IT WORKS -->
-<section id="how" class="fade-up">
-  <div class="section-eyebrow">How it works</div>
-  <h2 class="section-title">Seven phases. One build plan.</h2>
-  <p class="section-body">Each phase builds on the last. Every decision gets saved to a markdown file you can download and resume anytime — even pick up in a different session.</p>
-  <div class="steps">
-    <div class="step-card">
-      <div class="step-num">1</div>
-      <div class="step-title">Ideation</div>
-      <div class="step-body">Type your raw idea in plain English. The AI asks targeted questions, then synthesises a product kernel and gives an honest analysis of your idea's strengths and risks.</div>
+<section class="s" id="how">
+  <div class="si">
+    <div class="rev">
+      <div class="ey">How it works</div>
+      <h2 class="st">Seven phases.<br>One complete build plan.</h2>
+      <p class="sb">Each phase builds on the last. Every decision saves to a markdown file you can download and resume anytime — even in a different session.</p>
     </div>
-    <div class="step-card">
-      <div class="step-num">2</div>
-      <div class="step-title">Feature scoping</div>
-      <div class="step-body">We suggest industry-standard features for your product type, flagging anything that's more complex than it looks. You decide what ships in v1 and what waits for v2.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">3</div>
-      <div class="step-title">Agent selection</div>
-      <div class="step-body">Pick the coding agent you'll use. This changes how your build is chunked, how big each prompt is, and what format it needs. Cursor, Claude Code, Bolt, Lovable and more.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">4</div>
-      <div class="step-title">Stack & architecture</div>
-      <div class="step-body">Get a recommended tech stack specific to your product — with plain-English explanations for non-technical founders and honest trade-offs if you override anything.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">5</div>
-      <div class="step-title">Build chunking</div>
-      <div class="step-body">Your product gets broken into ordered, dependency-aware chunks — each one a single agent session with a clear definition of done. Nothing gets built on a shaky foundation.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">6</div>
-      <div class="step-title">Prompt generation</div>
-      <div class="step-body">Every chunk becomes a fully-formed, agent-ready prompt. Context, constraints, technical spec, and done-when checklist all included. Copy, paste, build. No back and forth.</div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">7</div>
-      <div class="step-title">Launch checklist</div>
-      <div class="step-body">A deployment checklist specific to your stack and features — not generic advice. Required items are flagged. Your v2 roadmap surfaces at the end to keep momentum going.</div>
+    <div class="how-g rev d2">
+      <div class="hc"><div class="hc-n">01</div><div class="hc-t">Ideation</div><div class="hc-b">Type your raw idea in plain English. The AI asks targeted questions, synthesises a product kernel, and gives an honest analysis of your idea's strengths and risks.</div></div>
+      <div class="hc"><div class="hc-n">02</div><div class="hc-t">Feature scoping</div><div class="hc-b">Industry-standard features suggested for your product type. Flag what's complex. Decide what ships in v1 and what waits — with a v2/v3 roadmap built in.</div></div>
+      <div class="hc"><div class="hc-n">03</div><div class="hc-t">Agent selection</div><div class="hc-b">Pick your coding agent — Cursor, Claude Code, Windsurf, Bolt, Lovable, v0. This changes how the build is chunked and how every single prompt is formatted.</div></div>
+      <div class="hc"><div class="hc-n">04</div><div class="hc-t">Stack &amp; architecture</div><div class="hc-b">A recommended tech stack specific to your product, explained in plain English. Override anything — we'll tell you the trade-offs honestly.</div></div>
+      <div class="hc"><div class="hc-n">05</div><div class="hc-t">Build chunking</div><div class="hc-b">Your product broken into ordered, dependency-aware chunks. Each one is a single agent session with a clear definition of done. Nothing built on a shaky foundation.</div></div>
+      <div class="hc"><div class="hc-n">06</div><div class="hc-t">Prompt generation</div><div class="hc-b">Every chunk becomes a fully-formed, agent-ready prompt. Context, constraints, technical spec, done-when checklist — all included. Copy, paste, build.</div></div>
+      <div class="hc"><div class="hc-n">07</div><div class="hc-t">Launch checklist</div><div class="hc-b">A deployment checklist specific to your stack and features — not generic advice. Required items flagged. Your v2 roadmap surfaces at the bottom.</div></div>
     </div>
   </div>
 </section>
 
 <!-- WHO IT'S FOR -->
-<section id="who" class="fade-up">
-  <div class="section-eyebrow">Who it's for</div>
-  <h2 class="section-title">Two kinds of builders.</h2>
-  <p class="section-body">Vibestudio works for both — it meets you where you are and scales to your technical level.</p>
-  <div class="audience-grid">
-    <div class="aud-card highlight">
-      <div class="aud-label">Non-technical founder</div>
-      <div class="aud-title">You have an idea. You can't build it.</div>
-      <div class="aud-quote">"I need something that holds my hand through every decision."</div>
-      <ul class="aud-list">
-        <li>Guided through every phase in plain English</li>
-        <li>AI suggests features, stack, and architecture</li>
-        <li>Prompts ready to paste into Bolt or Lovable</li>
-        <li>Launch checklist explains every step</li>
-        <li>No jargon — ever</li>
-      </ul>
+<section class="s who-s" id="who">
+  <div class="si">
+    <div class="rev">
+      <div class="ey">Who it's for</div>
+      <h2 class="st">Two kinds of builders.<br>One tool.</h2>
+      <p class="sb">Vibestudio meets you where you are and scales to your technical level — guided mode or expert mode.</p>
     </div>
-    <div class="aud-card">
-      <div class="aud-label">Technical builder</div>
-      <div class="aud-title">You can build it. You need structure.</div>
-      <div class="aud-quote">"I want a systematic approach, not a blank canvas."</div>
-      <ul class="aud-list">
-        <li>Move fast — skip the hand-holding</li>
-        <li>Override AI suggestions with trade-off analysis</li>
-        <li>Cursor, Claude Code, Windsurf prompt formats</li>
-        <li>Field-level data model control</li>
-        <li>Chunking granularity you control</li>
-      </ul>
+    <div class="who-g">
+      <div class="wc wc-a rev d1">
+        <div class="wc-lbl wc-lbl-a">Non-technical founder</div>
+        <div class="wc-t">You have an idea.<br>You can't build it.</div>
+        <div class="wc-q">"I need something that holds my hand through every decision without drowning me in jargon."</div>
+        <ul class="wc-ul">
+          <li>Guided through every phase in plain English</li>
+          <li>AI suggests features, stack, and architecture</li>
+          <li>Prompts ready to paste into Bolt or Lovable</li>
+          <li>Launch checklist explains every step</li>
+          <li>No technical knowledge required — ever</li>
+        </ul>
+      </div>
+      <div class="wc wc-b rev d2">
+        <div class="wc-lbl wc-lbl-b">Technical builder</div>
+        <div class="wc-t">You can build it.<br>You need structure.</div>
+        <div class="wc-q">"I want a systematic approach before I open my editor — not a blank canvas and good luck."</div>
+        <ul class="wc-ul">
+          <li>Move fast — skip the hand-holding</li>
+          <li>Override AI suggestions with trade-off analysis</li>
+          <li>Cursor, Claude Code, Windsurf prompt formats</li>
+          <li>Field-level data model control</li>
+          <li>Chunking granularity you control</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- WHAT YOU GET -->
-<section id="output" class="fade-up">
-  <div class="section-eyebrow">What you get</div>
-  <h2 class="section-title">One file. Everything in it.</h2>
-  <p class="section-body">At the end of each session you download a markdown file. It's your product brief, your build plan, your prompts, and your launch checklist — all in one. Import it anytime to resume.</p>
-  <div class="output-grid">
-    <div class="out-card">
-      <div class="out-icon">📋</div>
-      <div class="out-title">Product brief</div>
-      <div class="out-body">Your product kernel — problem, solution, target user, value prop, scope, and success metric. The north star for every decision downstream.</div>
+<section class="s" id="output">
+  <div class="si">
+    <div class="rev">
+      <div class="ey">What you get</div>
+      <h2 class="st">One file.<br>Everything in it.</h2>
+      <p class="sb">At the end of each session you download a markdown file — your product brief, build plan, prompts, and launch checklist in one. Import anytime to resume.</p>
     </div>
-    <div class="out-card">
-      <div class="out-icon">🗂</div>
-      <div class="out-title">Feature list</div>
-      <div class="out-body">MVP features with complexity ratings, pressure flags on anything tricky, and a v2/v3 roadmap so nothing gets lost.</div>
+    <div class="out-g rev d2">
+      <div class="oc"><div class="oc-ico">📋</div><div class="oc-t">Product brief</div><div class="oc-b">Your product kernel — problem, solution, target user, value prop, scope, and success metric. The north star for every decision downstream.</div></div>
+      <div class="oc"><div class="oc-ico">🗂</div><div class="oc-t">Feature list</div><div class="oc-b">MVP features with complexity ratings, scope flags on anything tricky, and a v2/v3 roadmap so nothing gets forgotten.</div></div>
+      <div class="oc"><div class="oc-ico">🏗</div><div class="oc-t">Architecture</div><div class="oc-b">Pages, data model, auth flow, and external services — specific to your product and stack. Not a generic template.</div></div>
+      <div class="oc"><div class="oc-ico">📦</div><div class="oc-t">Build plan</div><div class="oc-b">Ordered, dependency-aware chunks with done-when checklists. Each chunk knows what came before and what it enables next.</div></div>
+      <div class="oc"><div class="oc-ico">⚡</div><div class="oc-t">Agent prompts</div><div class="oc-b">One fully-formed prompt per chunk, formatted for your chosen agent. Copy and paste — nothing to add, nothing to clarify.</div></div>
+      <div class="oc"><div class="oc-ico">🚀</div><div class="oc-t">Launch checklist</div><div class="oc-b">Stack-specific checklist covering environment, database, auth, payments, security, and go-live. Required items flagged.</div></div>
     </div>
-    <div class="out-card">
-      <div class="out-icon">🏗</div>
-      <div class="out-title">Architecture</div>
-      <div class="out-body">Pages, data model, auth flow, and external services — specific to your product and stack, not a generic template.</div>
-    </div>
-    <div class="out-card">
-      <div class="out-icon">📦</div>
-      <div class="out-title">Build plan</div>
-      <div class="out-body">Ordered, dependency-aware chunks with done-when checklists. Each chunk knows what came before and what it enables next.</div>
-    </div>
-    <div class="out-card">
-      <div class="out-icon">⚡</div>
-      <div class="out-title">Agent prompts</div>
-      <div class="out-body">One fully-formed prompt per chunk, formatted for your chosen agent. Copy and paste — nothing to add or clarify.</div>
-    </div>
-    <div class="out-card">
-      <div class="out-icon">🚀</div>
-      <div class="out-title">Launch checklist</div>
-      <div class="out-body">Stack-specific checklist covering environment, database, auth, payments, security, and go-live. Required items flagged clearly.</div>
+  </div>
+</section>
+
+<!-- MD FILE -->
+<section class="s" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="si">
+    <div class="md-split">
+      <div class="rev">
+        <div class="ey">The MD file</div>
+        <h2 class="st">Your build plan<br>lives in one file.</h2>
+        <p class="sb" style="margin-bottom:2.5rem">Human-readable. Machine-parseable. Import it to resume from any phase, any time. Hand it to a developer and they have everything they need without a single conversation.</p>
+        <div class="md-props">
+          <div><div class="mp-t">Human-readable</div><div class="mp-b">Open in Notion, Obsidian, or any text editor and understand it immediately. No proprietary format, no lock-in.</div></div>
+          <div><div class="mp-t">Machine-parseable</div><div class="mp-b">YAML frontmatter stores all state — which phase, which agent, which chunks are done. Resume exactly where you left off.</div></div>
+          <div><div class="mp-t">Portable</div><div class="mp-b">Share with a developer, paste into any AI tool, or hand off to a team. Your entire product decision history in one document.</div></div>
+        </div>
+      </div>
+      <div class="md-block rev d2">
+        <div class="mdb-bar">
+          <div class="mdb-dot" style="background:#ff5f57"></div>
+          <div class="mdb-dot" style="background:#febc2e"></div>
+          <div class="mdb-dot" style="background:#28c840"></div>
+          <div class="mdb-fn">vibestudio-invoice-tracker.md</div>
+        </div>
+        <div class="mdb-pre"><pre><span class="my">---
+vibe-version: 1.0
+product: Invoice Tracker
+stage: prompt-generation
+agent: claude_code
+stack: Next.js + Supabase
+chunks-complete: [1, 2, 3, 4]
+chunks-pending: [5, 6, 7]
+---</span>
+
+<span class="mh1"># Invoice Tracker — Build Plan</span>
+
+<span class="mh2">## Product Kernel</span>
+
+<span class="mk">Problem:</span> <span class="mv">Freelancers lose time and money
+chasing unpaid invoices with tools
+built for accountants, not solo
+operators</span>
+
+<span class="mh2">## Chunk 05 — Invoice sending</span>
+
+<span class="mk">Depends on:</span> <span class="mv">Chunks 1, 2, 3, 4</span>
+<span class="mk">Delivers:</span> <span class="mv">Invoice sent via Resend</span>
+
+<span class="mco">### Done when</span>
+<span class="mc">- [x] Chunk 01 — scaffold</span>
+<span class="mc">- [x] Chunk 04 — invoices</span>
+- [ ] Send button triggers email
+- [ ] Status updates to sent
+
+<span class="mco">### Prompt (Claude Code)</span>
+<span class="mv">&lt;task&gt;Build invoice sending...&lt;/task&gt;</span></pre></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- VS -->
-<section class="fade-up">
-  <div class="section-eyebrow">Why not just use ChatGPT?</div>
-  <h2 class="section-title">Nobody owns the workflow layer.</h2>
-  <p class="section-body">Talking to an LLM gives you fragments. Vibestudio gives you a complete, resumable, agent-specific build plan.</p>
-  <div class="vs-grid">
-    <div class="vs-card">
-      <div class="vs-label them">Talking to an LLM directly</div>
-      <div class="vs-item"><span class="vs-x">✗</span> No memory of your product between sessions</div>
-      <div class="vs-item"><span class="vs-x">✗</span> You repeat context every time</div>
-      <div class="vs-item"><span class="vs-x">✗</span> No structure — just conversation</div>
-      <div class="vs-item"><span class="vs-x">✗</span> Outputs are fragments, not a plan</div>
-      <div class="vs-item"><span class="vs-x">✗</span> No agent-specific prompt formatting</div>
-      <div class="vs-item"><span class="vs-x">✗</span> No export to resume later</div>
+<section class="s">
+  <div class="si">
+    <div class="rev">
+      <div class="ey">Why not just use ChatGPT?</div>
+      <h2 class="st">Nobody owns<br>the workflow layer.</h2>
+      <p class="sb">Talking to an LLM gives you fragments. Vibestudio gives you a complete, resumable, agent-specific build plan — every time.</p>
     </div>
-    <div class="vs-card us">
-      <div class="vs-label us">Vibestudio</div>
-      <div class="vs-item"><span class="vs-check">✓</span> Persistent MD file — never lose context</div>
-      <div class="vs-item"><span class="vs-check">✓</span> Resume from any phase, any time</div>
-      <div class="vs-item"><span class="vs-check">✓</span> 7-phase structured build system</div>
-      <div class="vs-item"><span class="vs-check">✓</span> Complete, ordered build plan</div>
-      <div class="vs-item"><span class="vs-check">✓</span> Agent-specific format and chunking</div>
-      <div class="vs-item"><span class="vs-check">✓</span> Download and reimport MD to continue</div>
+    <div class="vs-g rev d2">
+      <div class="vc">
+        <div class="vc-hdr"><div class="vc-dot vc-dot-t"></div><div class="vc-lbl vc-lbl-t">Talking to an LLM directly</div></div>
+        <div class="vi"><span class="vsym vx">×</span>No memory of your product between sessions</div>
+        <div class="vi"><span class="vsym vx">×</span>You repeat context every single time</div>
+        <div class="vi"><span class="vsym vx">×</span>No structure — just conversation</div>
+        <div class="vi"><span class="vsym vx">×</span>Outputs are fragments, not a plan</div>
+        <div class="vi"><span class="vsym vx">×</span>No agent-specific prompt formatting</div>
+        <div class="vi"><span class="vsym vx">×</span>Nothing to export or resume later</div>
+      </div>
+      <div class="vc vc-us">
+        <div class="vc-hdr"><div class="vc-dot vc-dot-u"></div><div class="vc-lbl vc-lbl-u">Vibestudio</div></div>
+        <div class="vi"><span class="vsym vck">✓</span>Persistent MD file — never lose context</div>
+        <div class="vi"><span class="vsym vck">✓</span>Resume from any phase, any time</div>
+        <div class="vi"><span class="vsym vck">✓</span>7-phase structured build system</div>
+        <div class="vi"><span class="vsym vck">✓</span>Complete, ordered build plan every time</div>
+        <div class="vi"><span class="vsym vck">✓</span>Agent-specific format and chunking</div>
+        <div class="vi"><span class="vsym vck">✓</span>Download and reimport MD to continue</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- DEMO CTA -->
-<div class="demo-section">
-  <div class="section-eyebrow">Try it now</div>
-  <h2 class="section-title" style="margin-bottom:.75rem">See it working in 3 minutes</h2>
-  <p class="section-body">The demo walks through three real product ideas — a SaaS, a developer tool, and a marketplace. No signup, no credit card. Just open it and explore.</p>
-  <a href="demo.html" class="btn-hero btn-hero-primary" style="margin-top:1.5rem">Open the demo →</a>
-</div>
+<!-- CTA -->
+<section class="cta-s">
+  <div class="cta-si rev">
+    <div class="ey" style="justify-content:center">Try it now</div>
+    <h2 class="cta-t">See it working<br>in <em>3 minutes</em></h2>
+    <p class="cta-p">Three real product ideas — a SaaS, a developer tool, and a marketplace. No signup, no credit card. Just open it and explore.</p>
+    <div class="cta-chips">
+      <span class="chip">Invoice Tracker SaaS</span>
+      <span class="chip">API Cost Monitor</span>
+      <span class="chip">Fitness Marketplace</span>
+    </div>
+    <a href="demo.html" class="btn btn-p" style="font-size:16px;padding:16px 38px">Open the demo →</a>
+  </div>
+</section>
 
 <footer>
-  <div class="footer-logo">vibe<em>studio</em></div>
-  <div class="footer-sub">From idea to shipped product. No technical knowledge required.</div>
+  <div class="ft-i">
+    <div>
+      <div class="ft-logo">vibe<em>studio</em></div>
+      <div class="ft-sub">From idea to shipped product. No technical knowledge required.</div>
+    </div>
+    <div class="ft-links">
+      <a href="#how" class="ft-link">How it works</a>
+      <a href="#who" class="ft-link">Who it's for</a>
+      <a href="demo.html" class="ft-link">Try the demo</a>
+    </div>
+  </div>
 </footer>
 
 <script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50), {passive:true});
+
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, {threshold:0.1});
-document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+  entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('v');obs.unobserve(e.target)} });
+}, {threshold:.07, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+  });
+});
 </script>
 </body>
 </html>
